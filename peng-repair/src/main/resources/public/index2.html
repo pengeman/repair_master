@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维修记录列表</title>
+    <style>
+        body { font-family: sans-serif; padding: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .btn { padding: 5px 10px; background: #007bff; color: white; text-decoration: none; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h2>设备维修跟踪系统</h2>
+    <a href="create.html" class="btn">+ 新增设备报修</a>
+    <table>
+        <thead>
+            <tr>
+                <th>型号</th>
+                <th>编号</th>
+                <th>接单时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="list-body">
+            <tr>
+                <td>CNC-01</td>
+                <td>SN20240501</td>
+                <td>2024-05-10</td>
+                <td>维修中</td>
+                <td><a href="track.html?id=1" class="btn">过程跟踪</a></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

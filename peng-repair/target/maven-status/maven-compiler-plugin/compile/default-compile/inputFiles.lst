@@ -1,0 +1,11 @@
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/com/peng/repair/controller/RepairEquipmentController.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/com/peng/repair/domain/RepairEquipment.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/com/peng/repair/mapper/RepairEquipmentMapper.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/com/peng/repair/service/IRepairEquipmentService.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/com/peng/repair/service/impl/RepairEquipmentServiceImpl.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/org/peng/track/controller/RepairController.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/org/peng/track/model/FaultCategory.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/org/peng/track/model/NewClass.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/org/peng/track/model/RepairEquipment.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/org/peng/track/model/RepairProcess.java
+/home/peng/NetBeansProjects/RuoYi-master/peng-repair/src/main/java/org/peng/track/service/RepairService.java

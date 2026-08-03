@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建工单</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; }
+        .form-card { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 2rem; margin-top: 2rem; }
+        .compress-info { font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-primary mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">← 返回列表</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="form-card">
+                    <h4 class="mb-4 fw-bold text-center">新建维修工单</h4>
+                    <form id="createForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">业务员</label>
+                            <input type="text" name="salename" class="form-control" required maxlength="16">
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">设备型号</label>
+                                <input type="text" name="model" class="form-control" required maxlength="16">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold">设备编号</label>
+                                <input type="text" name="sn" class="form-control" required maxlength="32">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">派工单(图片)</label>
+                            <input type="file" name="dispatch_img" id="dispatch_img" class="form-control" accept="image/*" required>
+                            <small class="text-muted compress-info" id="compress_hint">请选择图片，图片将自动压缩</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">故障说明</label>
+                            <textarea name="fault_desc" class="form-control" rows="3" placeholder="描述客户反映的问题"></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">维修备注</label>
+                            <textarea name="repair_desc" class="form-control" rows="3" placeholder="内部备注信息"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold" id="submitBtn">确认接单并保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MAX_SIZE = 300 * 1024;
+        const MAX_WIDTH = 1024;
+        const INITIAL_QUALITY = 0.8;
+        const MIN_QUALITY = 0.5;
+
+        async function compressImage(file) {
+            if (!file.type.startsWith('image/')) return file;
+
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let quality = INITIAL_QUALITY;
+                        let canvas = document.createElement('canvas');
+                        let ctx = canvas.getContext('2d');
+
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > MAX_WIDTH) {
+                            height = (height * MAX_WIDTH) / width;
+                            width = MAX_WIDTH;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        function tryCompress() {
+                            canvas.toBlob(function(blob) {
+                                if (blob && blob.size > MAX_SIZE && quality > MIN_QUALITY) {
+                                    quality -= 0.1;
+                                    canvas.toBlob(function(b) {
+                                        blob = b;
+                                        if (blob && blob.size > MAX_SIZE && quality > MIN_QUALITY) {
+                                            tryCompress();
+                                        } else {
+                                            resolve(blob);
+                                        }
+                                    }, 'image/jpeg', quality);
+                                } else {
+                                    resolve(blob);
+                                }
+                            }, 'image/jpeg', quality);
+                        }
+
+                        tryCompress();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('dispatch_img').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const hint = document.getElementById('compress_hint');
+            hint.textContent = '正在压缩图片...';
+
+            const compressed = await compressImage(file);
+
+            if (compressed.size < file.size) {
+                const newFile = new File([compressed], file.name, { type: 'image/jpeg' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(newFile);
+                e.target.files = dataTransfer.files;
+                hint.textContent = `压缩完成: ${(compressed.size / 1024).toFixed(1)}KB`;
+            } else {
+                hint.textContent = `原图大小: ${(file.size / 1024).toFixed(1)}KB，无需压缩`;
+            }
+        });
+
+        document.getElementById('createForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('dispatch_img');
+            if (fileInput.files.length > 0) {
+                const compressed = await compressImage(fileInput.files[0]);
+                const newFile = new File([compressed], fileInput.files[0].name, { type: 'image/jpeg' });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(newFile);
+                fileInput.files = dataTransfer.files;
+            }
+
+            const formData = new FormData(this);
+
+            fetch('/api/repair/create', { method: 'POST', body: formData })
+                .then(res => {
+                    if (res.ok) window.location.href = '/index.html';
+                    else alert('提交失败');
+                });
+        });
+    </script>
+</body>
+</html>
