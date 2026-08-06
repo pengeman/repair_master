@@ -122,5 +122,5 @@
         </plugins>
         <finalName>${project.artifactId}</finalName>
     </build>
-
+    <groupId>com.peng</groupId>
 </project>

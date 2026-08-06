@@ -1,0 +1,58 @@
+/* ==========================================================
+ * ry-ui-ext.css —— 项目扩展公共样式（统一显示风格）
+ * 用途：详情/浏览页、只读表单、状态标签等页面的统一样式。
+ * 约定：所有新页面优先使用这里的样式类，禁止页面内联重复定义。
+ * ========================================================== */
+
+/* ---------- 只读表单（浏览/详情页） ----------
+ * 与编辑页 form-horizontal 布局保持一致，仅底色区分只读态。
+ * 用法：<input th:value="..." class="form-control" readonly>
+ */
+.form-control[readonly] {
+    background: #f8f9fa;
+}
+
+/* ---------- 状态标签 ----------
+ * 用法：<span class="tag-wait">待开始</span>
+ * 已完工复用 ry-ui.css 内置的 .tag-ok，异常复用 .tag-err。
+ */
+.tag-wait {
+    display: inline-block;
+    padding: 2px 10px;
+    background: #f0f4ff;
+    color: #3b7cff;
+    border: 1px solid #b8ccf5;
+    border-radius: 3px;
+    font-size: 12px;
+}
+.tag-run {
+    display: inline-block;
+    padding: 2px 10px;
+    background: #fff8ec;
+    color: #e67e22;
+    border: 1px solid #f5d9ab;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+/* ---------- 工单/附件图片预览 ----------
+ * 用法：<img class="detail-img" th:src="...">
+ *       <div class="img-hint">文件名</div>
+ */
+.detail-img {
+    display: block;
+    max-width: 100%;
+    max-height: 320px;
+    margin: 12px auto 0;
+    border: 1px solid #e8ecf0;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    cursor: zoom-in;
+}
+.img-hint {
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    padding: 6px 0 14px;
+    word-break: break-all;
+}
