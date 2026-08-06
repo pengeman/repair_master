@@ -7,7 +7,7 @@ import com.peng.repair.domain.RepairEquipment;
  * 工单维护Service接口
  * 
  * @author pengweitao
- * @date 2026-06-26
+ * @date 2026-08-04
  */
 public interface IRepairEquipmentService 
 {

@@ -11,7 +11,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 工单维护对象 repair_equipment
  * 
  * @author pengweitao
- * @date 2026-06-26
+ * @date 2026-08-04
  */
 public class RepairEquipment extends BaseEntity
 {
@@ -20,8 +20,8 @@ public class RepairEquipment extends BaseEntity
     /**  */
     private Long id;
 
-    /** 型号 */
-    @Excel(name = "型号")
+    /** 板型 */
+    @Excel(name = "板型")
     private String model;
 
     /** 编号 */
@@ -29,7 +29,6 @@ public class RepairEquipment extends BaseEntity
     private String sn;
 
     /** 工单 */
-    @Excel(name = "工单")
     private String dispatchImg;
 
     /** 问题描述 */
@@ -41,11 +40,9 @@ public class RepairEquipment extends BaseEntity
     private String repairDesc;
 
     /** 问题原因 */
-    @Excel(name = "问题原因")
     private String faultReason;
 
     /** 总结 */
-    @Excel(name = "总结")
     private String summary;
 
     /** 工单时间 */
@@ -62,18 +59,18 @@ public class RepairEquipment extends BaseEntity
     @Excel(name = "业务员")
     private String salename;
 
-    /** 工单状态 */
-    @Excel(name = "工单状态")
+    /** 1待开始，2维修中，3已完工 */
     private Long status;
 
     /** 结束时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @Excel(name = "结束时间", width = 30, dateFormat = "yyyy-MM-dd")
     private Date endTime;
 
-    /** 问题类型 */
-    @Excel(name = "问题类型")
+    /** 外键 fault_categories.id */
     private Long faultType;
+
+    /** 质保期 */
+    @Excel(name = "质保期")
+    private Long quality;
 
     public void setId(Long id) 
     {
@@ -215,6 +212,16 @@ public class RepairEquipment extends BaseEntity
         return faultType;
     }
 
+    public void setQuality(Long quality) 
+    {
+        this.quality = quality;
+    }
+
+    public Long getQuality() 
+    {
+        return quality;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -232,6 +239,7 @@ public class RepairEquipment extends BaseEntity
             .append("status", getStatus())
             .append("endTime", getEndTime())
             .append("faultType", getFaultType())
+            .append("quality", getQuality())
             .toString();
     }
 }

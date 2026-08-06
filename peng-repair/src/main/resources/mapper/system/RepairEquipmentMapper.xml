@@ -19,21 +19,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="status"    column="status"    />
         <result property="endTime"    column="end_time"    />
         <result property="faultType"    column="fault_type"    />
+        <result property="quality"    column="quality"    />
     </resultMap>
 
     <sql id="selectRepairEquipmentVo">
-        select id, model, sn, dispatch_img, fault_desc, repair_desc, fault_reason, summary, order_time, start_time, salename, status, end_time, fault_type from repair_equipment
+        select id, model, sn, dispatch_img, fault_desc, repair_desc, fault_reason, summary, order_time, start_time, salename, status, end_time, fault_type, quality from repair_equipment
     </sql>
 
     <select id="selectRepairEquipmentList" parameterType="RepairEquipment" resultMap="RepairEquipmentResult">
         <include refid="selectRepairEquipmentVo"/>
         <where>  
-            <if test="model != null  and model != ''"> and model like concat('%', #{model}, '%')</if>
-            <if test="sn != null  and sn != ''"> and sn like concat('%', #{sn}, '%')</if>
-            <if test="params.beginOrderTime != null and params.beginOrderTime != '' and params.endOrderTime != null and params.endOrderTime != ''"> and order_time between #{params.beginOrderTime} and #{params.endOrderTime}</if>
-            <if test="salename != null  and salename != ''"> and salename like concat('%', #{salename}, '%')</if>
-            <if test="status != null "> and status = #{status}</if>
-            <if test="faultType != null "> and fault_type = #{faultType}</if>
+            <if test="model != null  and model != ''"> and model = #{model}</if>
+            <if test="sn != null  and sn != ''"> and sn = #{sn}</if>
+            <if test="quality != null "> and quality = #{quality}</if>
         </where>
     </select>
     
@@ -58,6 +56,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null">status,</if>
             <if test="endTime != null">end_time,</if>
             <if test="faultType != null">fault_type,</if>
+            <if test="quality != null">quality,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="model != null">#{model},</if>
@@ -73,6 +72,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null">#{status},</if>
             <if test="endTime != null">#{endTime},</if>
             <if test="faultType != null">#{faultType},</if>
+            <if test="quality != null">#{quality},</if>
          </trim>
     </insert>
 
@@ -92,6 +92,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null">status = #{status},</if>
             <if test="endTime != null">end_time = #{endTime},</if>
             <if test="faultType != null">fault_type = #{faultType},</if>
+            <if test="quality != null">quality = #{quality},</if>
         </trim>
         where id = #{id}
     </update>

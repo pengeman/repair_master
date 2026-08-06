@@ -12,7 +12,7 @@ import com.ruoyi.common.core.text.Convert;
  * 工单维护Service业务层处理
  * 
  * @author pengweitao
- * @date 2026-06-26
+ * @date 2026-08-04
  */
 @Service
 public class RepairEquipmentServiceImpl implements IRepairEquipmentService 
@@ -53,7 +53,6 @@ public class RepairEquipmentServiceImpl implements IRepairEquipmentService
     @Override
     public int insertRepairEquipment(RepairEquipment repairEquipment)
     {
-        System.out.println("56repairEquipment: " + repairEquipment);
         return repairEquipmentMapper.insertRepairEquipment(repairEquipment);
     }
 

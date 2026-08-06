@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
 import com.peng.repair.domain.RepairEquipment;
@@ -21,13 +19,11 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
 
-import java.io.File;
-
 /**
  * 工单维护Controller
  * 
  * @author pengweitao
- * @date 2026-06-26
+ * @date 2026-08-04
  */
 @Controller
 @RequestMapping("/system/equipment")
@@ -89,27 +85,8 @@ public class RepairEquipmentController extends BaseController
     @Log(title = "工单维护", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(RepairEquipment repairEquipment,
-            @RequestParam(value = "dispatchImgFile", required = false) MultipartFile file)
+    public AjaxResult addSave(RepairEquipment repairEquipment)
     {
-        // 处理文件上传
-        if (file != null && !file.isEmpty()) {
-            try {
-                String fileName = "dispatch_" + System.currentTimeMillis();
-                String uploadDir = com.ruoyi.common.config.RuoYiConfig.getProfile() + "/repair/pics/";
-                File destDir = new File(uploadDir);
-                if (!destDir.exists()) {
-                    destDir.mkdirs();
-                }
-                String file2 = uploadDir + fileName;
-                System.out.println("file2 : " + file2);
-                file.transferTo(new File(file2));
-                repairEquipment.setDispatchImg(fileName);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return AjaxResult.error("文件上传失败");
-            }
-        }
         return toAjax(repairEquipmentService.insertRepairEquipment(repairEquipment));
     }
 
@@ -123,6 +100,18 @@ public class RepairEquipmentController extends BaseController
         RepairEquipment repairEquipment = repairEquipmentService.selectRepairEquipmentById(id);
         mmap.put("repairEquipment", repairEquipment);
         return prefix + "/edit";
+    }
+
+    /**
+     * 浏览工单维护
+     */
+    @RequiresPermissions("system:equipment:list")
+    @GetMapping("/detail/{id}")
+    public String detail(@PathVariable("id") Long id, ModelMap mmap)
+    {
+        RepairEquipment repairEquipment = repairEquipmentService.selectRepairEquipmentById(id);
+        mmap.put("repairEquipment", repairEquipment);
+        return prefix + "/detail";
     }
 
     /**

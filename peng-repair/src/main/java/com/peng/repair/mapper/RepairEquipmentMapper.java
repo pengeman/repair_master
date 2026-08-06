@@ -2,16 +2,14 @@ package com.peng.repair.mapper;
 
 import java.util.List;
 import com.peng.repair.domain.RepairEquipment;
-import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 工单维护Mapper接口
- *
+ * 
  * @author pengweitao
- * @date 2026-06-26
+ * @date 2026-08-04
  */
-@Mapper
-public interface RepairEquipmentMapper
+public interface RepairEquipmentMapper 
 {
     /**
      * 查询工单维护

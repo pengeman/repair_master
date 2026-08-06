@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.peng.repair.mapper.RepairProcessMapper">
+    
+    <resultMap type="RepairProcess" id="RepairProcessResult">
+        <result property="id"    column="id"    />
+        <result property="mainId"    column="main_id"    />
+        <result property="mediaFile"    column="media_file"    />
+        <result property="mediaDesc"    column="media_desc"    />
+        <result property="recordTime"    column="record_time"    />
+        <result property="fileType"    column="file_type"    />
+    </resultMap>
+
+    <sql id="selectRepairProcessVo">
+        select id, main_id, media_file, media_desc, record_time, file_type from repair_process
+    </sql>
+
+    <select id="selectRepairProcessList" parameterType="RepairProcess" resultMap="RepairProcessResult">
+        <include refid="selectRepairProcessVo"/>
+        <where>  
+        </where>
+    </select>
+    
+    <select id="selectRepairProcessById" parameterType="Long" resultMap="RepairProcessResult">
+        <include refid="selectRepairProcessVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertRepairProcess" parameterType="RepairProcess" useGeneratedKeys="true" keyProperty="id">
+        insert into repair_process
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mainId != null">main_id,</if>
+            <if test="mediaFile != null">media_file,</if>
+            <if test="mediaDesc != null">media_desc,</if>
+            <if test="recordTime != null">record_time,</if>
+            <if test="fileType != null">file_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mainId != null">#{mainId},</if>
+            <if test="mediaFile != null">#{mediaFile},</if>
+            <if test="mediaDesc != null">#{mediaDesc},</if>
+            <if test="recordTime != null">#{recordTime},</if>
+            <if test="fileType != null">#{fileType},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRepairProcess" parameterType="RepairProcess">
+        update repair_process
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mainId != null">main_id = #{mainId},</if>
+            <if test="mediaFile != null">media_file = #{mediaFile},</if>
+            <if test="mediaDesc != null">media_desc = #{mediaDesc},</if>
+            <if test="recordTime != null">record_time = #{recordTime},</if>
+            <if test="fileType != null">file_type = #{fileType},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRepairProcessById" parameterType="Long">
+        delete from repair_process where id = #{id}
+    </delete>
+
+    <delete id="deleteRepairProcessByIds" parameterType="String">
+        delete from repair_process where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
