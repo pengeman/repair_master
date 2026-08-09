@@ -54,6 +54,48 @@ body.signin {
 	border-radius:3px;
 	padding:30px
 }
+/* 登录标题 */
+.signinpanel .login-title {
+	font-size:18px;
+	color:#fff;
+	margin-bottom:5px
+}
+.signinpanel .login-title i {
+	margin-right:6px
+}
+/* 左侧功能介绍 */
+.signinpanel .login-feature {
+	list-style:none;
+	padding:0;
+	margin:25px 0
+}
+.signinpanel .login-feature li {
+	margin-bottom:10px;
+	font-size:14px;
+	color:rgba(255,255,255,.9)
+}
+.signinpanel .login-feature li i {
+	margin-right:8px;
+	color:#1ab394
+}
+/* 登录按钮 */
+.signinpanel #btnSubmit {
+	height:40px;
+	line-height:40px;
+	padding:0;
+	font-size:15px;
+	letter-spacing:4px;
+	background:#1ab394;
+	border-color:#1ab394
+}
+.signinpanel #btnSubmit:hover {
+	background:#18a689;
+	border-color:#18a689
+}
+/* 记住我 */
+.signinpanel .checkbox-custom {
+	color:rgba(255,255,255,.9)
+}
 .signup-footer {
 	border-top:solid 1px rgba(255,255,255,.3);
 	margin:20px 0;

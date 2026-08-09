@@ -134,6 +134,8 @@
                 }]
             };
             $.table.init(options);
+            // 默认隐藏查询栏（可通过工具栏搜索按钮展开/收起）
+            $(".search-collapse").hide();
             // 点击行内内容（非按钮/复选框）进入浏览
             $("#bootstrap-table").on("click", "tbody td", function(e) {
                 // 排除点击按钮/链接/复选框/输入框等控件

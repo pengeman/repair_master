@@ -11,15 +11,33 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="mediaDesc"    column="media_desc"    />
         <result property="recordTime"    column="record_time"    />
         <result property="fileType"    column="file_type"    />
+        <!-- 列表展示 repair_equipment 字段 -->
+        <result property="model"    column="model"    />
+        <result property="sn"    column="sn"    />
+        <result property="faultDesc"    column="fault_desc"    />
+        <result property="repairDesc"    column="repair_desc"    />
+        <result property="orderTime"    column="order_time"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="salename"    column="salename"    />
+        <result property="status"    column="status"    />
+        <result property="quality"    column="quality"    />
     </resultMap>
 
     <sql id="selectRepairProcessVo">
         select id, main_id, media_file, media_desc, record_time, file_type from repair_process
     </sql>
 
+    <sql id="selectRepairEquipmentVo">
+        select id, model, sn, fault_desc, repair_desc, order_time, start_time, salename, status, quality from repair_equipment
+    </sql>
+
     <select id="selectRepairProcessList" parameterType="RepairProcess" resultMap="RepairProcessResult">
-        <include refid="selectRepairProcessVo"/>
-        <where>  
+        <include refid="selectRepairEquipmentVo"/>
+        <where>
+            <if test="model != null  and model != ''"> and model = #{model}</if>
+            <if test="sn != null  and sn != ''"> and sn = #{sn}</if>
+            <if test="salename != null  and salename != ''"> and salename = #{salename}</if>
+            <if test="status != null "> and status = #{status}</if>
         </where>
     </select>
     

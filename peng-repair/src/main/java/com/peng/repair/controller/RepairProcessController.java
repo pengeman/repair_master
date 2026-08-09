@@ -9,15 +9,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
 import com.peng.repair.domain.RepairProcess;
+import com.peng.repair.domain.RepairEquipment;
 import com.peng.repair.service.IRepairProcessService;
+import com.peng.repair.service.IRepairEquipmentService;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.utils.StringUtils;
 
 /**
  * 维修过程Controller
@@ -33,6 +37,9 @@ public class RepairProcessController extends BaseController
 
     @Autowired
     private IRepairProcessService repairProcessService;
+
+    @Autowired
+    private IRepairEquipmentService repairEquipmentService;
 
     @RequiresPermissions("repair:process:view")
     @GetMapping()
@@ -85,8 +92,15 @@ public class RepairProcessController extends BaseController
      */
     @RequiresPermissions("repair:process:add")
     @GetMapping("/add")
-    public String add()
+    public String add(@RequestParam(value = "mainId", required = false) Long mainId, ModelMap mmap)
     {
+        // 主表工单数据（根据 URL 传入的 mainId 查询 repair_equipment）
+        if (StringUtils.isNotNull(mainId))
+        {
+            RepairEquipment repairEquipment = repairEquipmentService.selectRepairEquipmentById(mainId);
+            mmap.put("repairEquipment", repairEquipment);
+            mmap.put("mainId", mainId);
+        }
         return prefix + "/add";
     }
 
