@@ -17,6 +17,8 @@ import com.peng.repair.domain.RepairProcess;
 import com.peng.repair.domain.RepairEquipment;
 import com.peng.repair.service.IRepairProcessService;
 import com.peng.repair.service.IRepairEquipmentService;
+import com.peng.repair.service.IFaultCategoryService;
+import com.peng.repair.service.IFaultCauseService;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -40,6 +42,12 @@ public class RepairProcessController extends BaseController
 
     @Autowired
     private IRepairEquipmentService repairEquipmentService;
+
+    @Autowired
+    private IFaultCategoryService faultCategoryService;
+
+    @Autowired
+    private IFaultCauseService faultCauseService;
 
     @RequiresPermissions("repair:process:view")
     @GetMapping()
@@ -76,15 +84,36 @@ public class RepairProcessController extends BaseController
     }
 
     /**
-     * 查看维修过程详情
+     * 查看维修过程详情（该工单的所有维修记录）
      */
     @RequiresPermissions("repair:process:view")
     @GetMapping("/view/{id}")
     public String view(@PathVariable("id") Long id, ModelMap mmap)
     {
-        RepairProcess repairProcess = repairProcessService.selectRepairProcessById(id);
-        mmap.put("repairProcess", repairProcess);
+        // id 为工单主键（列表展示的是 repair_equipment 数据），查询该工单所有维修记录
+        List<RepairProcess> processList = repairProcessService.selectRepairProcessListByMainId(id);
+        mmap.put("processList", processList);
         return prefix + "/view";
+    }
+
+    /**
+     * 维修完结弹窗页面
+     */
+    @RequiresPermissions("repair:process:view")
+    @GetMapping("/finish")
+    public String finish(@RequestParam(value = "mainId", required = false) Long mainId, ModelMap mmap)
+    {
+        // 关联的工单数据（根据 mainId 查询 repair_equipment，用于回显问题描述）
+        if (StringUtils.isNotNull(mainId))
+        {
+            RepairEquipment repairEquipment = repairEquipmentService.selectRepairEquipmentById(mainId);
+            mmap.put("repairEquipment", repairEquipment);
+            mmap.put("mainId", mainId);
+        }
+        // 故障原因（fault_cause 表）、故障分类（fault_categories 表）选项数据
+        mmap.put("causeList", faultCauseService.selectFaultCauseList());
+        mmap.put("categoryList", faultCategoryService.selectFaultCategoryList());
+        return prefix + "/finish";
     }
 
     /**

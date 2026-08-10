@@ -45,6 +45,18 @@ public class RepairProcessServiceImpl implements IRepairProcessService
     }
 
     /**
+     * 按工单id查询维修记录列表
+     * 
+     * @param mainId 工单主键
+     * @return 维修记录集合
+     */
+    @Override
+    public List<RepairProcess> selectRepairProcessListByMainId(Long mainId)
+    {
+        return repairProcessMapper.selectRepairProcessListByMainId(mainId);
+    }
+
+    /**
      * 新增维修过程
      * 
      * @param repairProcess 维修过程

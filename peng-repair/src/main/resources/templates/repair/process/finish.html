@@ -1,42 +1,110 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" >
 <head>
-    <th:block th:include="include :: header('维修过程详细')" />
+    <th:block th:include="include :: header('维修完结')" />
 </head>
-<body>
-    <div class="main-content">
-        <form class="form-horizontal" th:object="${repairProcess}">
-            <h4 class="form-header h4">基本信息</h4>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 control-label">过程图片：</label>
-                        <div class="col-sm-8">
-                            <p class="form-control-plaintext" th:text="*{mediaFile}"></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 control-label">过程描述：</label>
-                        <div class="col-sm-8">
-                            <p class="form-control-plaintext" th:text="*{mediaDesc}"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label class="col-sm-4 control-label">记录时间：</label>
-                        <div class="col-sm-8">
-                            <p class="form-control-plaintext" th:text="*{#dates.format(recordTime, 'yyyy-MM-dd HH:mm:ss')}"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<body class="white-bg">
+    <div class="wrapper wrapper-content">
+        <form id="finishForm" style="padding: 0 15px;">
+            <label class="form-label">① 返厂原因（故障说明）</label>
+            <div class="form-control-static finish-static" id="finish_fault_desc" th:text="${repairEquipment.faultDesc}">有外露，检查是否有内容，修好处打压检测报告</div>
+
+            <label class="form-label">② 故障原因分析</label>
+            <input type="text" class="form-control" id="finish_fault_reason" placeholder="点击选择故障原因" readonly="" onclick="openCauseModal()">
+
+            <label class="form-label">③ 原因描述</label>
+            <textarea class="form-control" id="finish_cause_desc" rows="2" placeholder="请输入详细原因描述"></textarea>
+
+            <label class="form-label">④ 故障分类 <small class="text-muted">（点击选择，可多选）</small></label>
+            <input type="text" class="form-control" id="fault_type_display" placeholder="点击选择故障分类" readonly="" onclick="openCategoryModal()">
+
+            <label class="form-label">⑤ 维修说明</label>
+            <textarea class="form-control" id="finish_repair_desc" rows="2" placeholder="维修说明将自动填充"></textarea>
+
+            <label class="form-label">⑥ 维修总结</label>
+            <textarea class="form-control" id="finish_summary" rows="2" placeholder="请输入维修总结"></textarea>
+
+            <button type="button" class="btn btn-success btn-block" onclick="submitFinish()">生成总结</button>
         </form>
     </div>
     <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        // ② 故障原因分析选项：来自 fault_categories 表（name 字段）
+        var faultReasons = [[${categoryList}]];
+        // ④ 故障分类选项：来自 fault_cause 表（cause 字段）
+        var faultTypes = [[${causeList}]];
+
+        // 故障原因选择弹窗（数据源 fault_categories 表）
+        function openCauseModal() {
+            var html = '<div style="padding: 15px;">';
+            for (var i = 0; i < faultReasons.length; i++) {
+                html += '<a class="btn btn-default btn-block m-b-xs" href="javascript:void(0)" onclick="selectCause(\'' + faultReasons[i].name + '\')">' + faultReasons[i].name + '</a>';
+            }
+            html += '</div>';
+            layer.open({
+                type: 1,
+                title: '选择故障原因',
+                area: ['300px', 'auto'],
+                content: html
+            });
+        }
+
+        function selectCause(val) {
+            $('#finish_fault_reason').val(val);
+            layer.closeAll();
+        }
+
+        // 故障分类多选弹窗（数据源 fault_cause 表）
+        function openCategoryModal() {
+            var html = '<div style="padding: 15px;">';
+            for (var i = 0; i < faultTypes.length; i++) {
+                html += '<label class="checkbox-inline m-r-sm m-b-xs"><input type="checkbox" class="category-check" value="' + faultTypes[i].cause + '"> ' + faultTypes[i].cause + '</label>';
+                if ((i + 1) % 3 == 0) {
+                    html += '<br>';
+                }
+            }
+            html += '<br><button type="button" class="btn btn-success btn-block" onclick="selectCategories()">确定</button>';
+            html += '</div>';
+            layer.open({
+                type: 1,
+                title: '选择故障分类（可多选）',
+                area: ['380px', 'auto'],
+                content: html
+            });
+        }
+
+        function selectCategories() {
+            var arr = [];
+            $('.category-check:checked').each(function() {
+                arr.push($(this).val());
+            });
+            $('#fault_type_display').val(arr.join('、'));
+            layer.closeAll();
+        }
+
+        // 确认完工提交
+        function submitFinish() {
+            var faultReason = $('#finish_fault_reason').val();
+            var category = $('#fault_type_display').val();
+            var summary = $('#finish_summary').val();
+            if ($.common.isEmpty(faultReason)) {
+                $.modal.alertWarning('请选择故障原因');
+                return;
+            }
+            if ($.common.isEmpty(category)) {
+                $.modal.alertWarning('请选择故障分类');
+                return;
+            }
+            if ($.common.isEmpty(summary)) {
+                $.modal.alertWarning('请输入维修总结');
+                return;
+            }
+            $.modal.confirm('确认该工单维修完结？', function() {
+                // TODO: 提交后端保存
+                $.modal.msgSuccess('维修完结提交成功');
+                layer.closeAll();
+            });
+        }
+    </script>
 </body>
 </html>

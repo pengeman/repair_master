@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.peng.repair.mapper.FaultCauseMapper">
+
+    <resultMap type="FaultCause" id="FaultCauseResult">
+        <result property="id"    column="id"    />
+        <result property="cause"    column="cause"    />
+    </resultMap>
+
+    <select id="selectFaultCauseList" resultMap="FaultCauseResult">
+        select id, cause from fault_cause
+        order by id
+    </select>
+
+</mapper>

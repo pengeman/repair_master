@@ -46,6 +46,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </select>
 
+    <select id="selectRepairProcessListByMainId" parameterType="Long" resultMap="RepairProcessResult">
+        <include refid="selectRepairProcessVo"/>
+        where main_id = #{mainId}
+        order by record_time desc, id desc
+    </select>
+
     <insert id="insertRepairProcess" parameterType="RepairProcess" useGeneratedKeys="true" keyProperty="id">
         insert into repair_process
         <trim prefix="(" suffix=")" suffixOverrides=",">

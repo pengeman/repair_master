@@ -28,6 +28,14 @@ public interface IRepairProcessService
     public List<RepairProcess> selectRepairProcessList(RepairProcess repairProcess);
 
     /**
+     * 按工单id查询维修记录列表
+     * 
+     * @param mainId 工单主键
+     * @return 维修记录集合
+     */
+    public List<RepairProcess> selectRepairProcessListByMainId(Long mainId);
+
+    /**
      * 新增维修过程
      * 
      * @param repairProcess 维修过程
