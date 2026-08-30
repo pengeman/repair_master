@@ -42,6 +42,12 @@ public class RepairEquipment extends BaseEntity
     /** 问题原因 */
     private String faultReason;
 
+    /** 原因描述 */
+    private String causeDesc;
+
+    /** 故障分类(多选) */
+    private String faultTypeDesc;
+
     /** 总结 */
     private String summary;
 
@@ -62,15 +68,33 @@ public class RepairEquipment extends BaseEntity
     /** 1待开始，2维修中，3已完工 */
     private Long status;
 
+    /** 维修状态(0待开始，1维修中，2完成) */
+    private Long repairStatus;
+
     /** 结束时间 */
     private Date endTime;
 
     /** 外键 fault_categories.id */
     private Long faultType;
 
+    /** 故障原因id */
+    private Long faultCauseId;
+
     /** 质保期 */
     @Excel(name = "质保期")
     private Long quality;
+
+    /** 客户 */
+    @Excel(name = "客户")
+    private String client;
+
+    /** 客户地址 */
+    @Excel(name = "客户地址")
+    private String clientAdd;
+
+    /** 联系人 */
+    @Excel(name = "联系人")
+    private String connection;
 
     public void setId(Long id) 
     {
@@ -142,6 +166,26 @@ public class RepairEquipment extends BaseEntity
         return faultReason;
     }
 
+    public void setCauseDesc(String causeDesc) 
+    {
+        this.causeDesc = causeDesc;
+    }
+
+    public String getCauseDesc() 
+    {
+        return causeDesc;
+    }
+
+    public void setFaultTypeDesc(String faultTypeDesc) 
+    {
+        this.faultTypeDesc = faultTypeDesc;
+    }
+
+    public String getFaultTypeDesc() 
+    {
+        return faultTypeDesc;
+    }
+
     public void setSummary(String summary) 
     {
         this.summary = summary;
@@ -192,6 +236,16 @@ public class RepairEquipment extends BaseEntity
         return status;
     }
 
+    public void setRepairStatus(Long repairStatus) 
+    {
+        this.repairStatus = repairStatus;
+    }
+
+    public Long getRepairStatus() 
+    {
+        return repairStatus;
+    }
+
     public void setEndTime(Date endTime) 
     {
         this.endTime = endTime;
@@ -212,6 +266,16 @@ public class RepairEquipment extends BaseEntity
         return faultType;
     }
 
+    public void setFaultCauseId(Long faultCauseId) 
+    {
+        this.faultCauseId = faultCauseId;
+    }
+
+    public Long getFaultCauseId() 
+    {
+        return faultCauseId;
+    }
+
     public void setQuality(Long quality) 
     {
         this.quality = quality;
@@ -220,6 +284,36 @@ public class RepairEquipment extends BaseEntity
     public Long getQuality() 
     {
         return quality;
+    }
+
+    public void setClient(String client) 
+    {
+        this.client = client;
+    }
+
+    public String getClient() 
+    {
+        return client;
+    }
+
+    public void setClientAdd(String clientAdd) 
+    {
+        this.clientAdd = clientAdd;
+    }
+
+    public String getClientAdd() 
+    {
+        return clientAdd;
+    }
+
+    public void setConnection(String connection) 
+    {
+        this.connection = connection;
+    }
+
+    public String getConnection() 
+    {
+        return connection;
     }
 
     @Override
@@ -240,6 +334,9 @@ public class RepairEquipment extends BaseEntity
             .append("endTime", getEndTime())
             .append("faultType", getFaultType())
             .append("quality", getQuality())
+            .append("client", getClient())
+            .append("clientAdd", getClientAdd())
+            .append("connection", getConnection())
             .toString();
     }
 }

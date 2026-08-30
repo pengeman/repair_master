@@ -11,6 +11,7 @@
 
             <label class="form-label">② 故障原因分析</label>
             <input type="text" class="form-control" id="finish_fault_reason" placeholder="点击选择故障原因" readonly="" onclick="openCauseModal()">
+            <input type="hidden" id="finish_fault_reason_id">
 
             <label class="form-label">③ 原因描述</label>
             <textarea class="form-control" id="finish_cause_desc" rows="2" placeholder="请输入详细原因描述"></textarea>
@@ -22,23 +23,28 @@
             <textarea class="form-control" id="finish_repair_desc" rows="2" placeholder="维修说明将自动填充"></textarea>
 
             <label class="form-label">⑥ 维修总结</label>
-            <textarea class="form-control" id="finish_summary" rows="2" placeholder="请输入维修总结"></textarea>
+            <textarea class="form-control" id="finish_summary" rows="3" placeholder="可点击下方「生成总结」自动生成，也可手动输入"></textarea>
 
-            <button type="button" class="btn btn-success btn-block" onclick="submitFinish()">生成总结</button>
+            <button type="button" class="btn btn-info btn-block m-b-sm" onclick="genSummary()">生成总结</button>
+            <button type="button" class="btn btn-success btn-block" onclick="submitFinish()">确认完工</button>
         </form>
     </div>
     <th:block th:include="include :: footer" />
     <script th:inline="javascript">
+        var prefix = ctx + "repair/process";
+        var mainId = [[${mainId}]];
         // ② 故障原因分析选项：来自 fault_categories 表（name 字段）
         var faultReasons = [[${categoryList}]];
         // ④ 故障分类选项：来自 fault_cause 表（cause 字段）
         var faultTypes = [[${causeList}]];
+        // 选中的故障分类 id 列表（多选）
+        var selectedFaultTypeIds = [];
 
         // 故障原因选择弹窗（数据源 fault_categories 表）
         function openCauseModal() {
             var html = '<div style="padding: 15px;">';
             for (var i = 0; i < faultReasons.length; i++) {
-                html += '<a class="btn btn-default btn-block m-b-xs" href="javascript:void(0)" onclick="selectCause(\'' + faultReasons[i].name + '\')">' + faultReasons[i].name + '</a>';
+                html += '<a class="btn btn-default btn-block m-b-xs" href="javascript:void(0)" onclick="selectCause(' + faultReasons[i].id + ', \'' + faultReasons[i].name + '\')">' + faultReasons[i].name + '</a>';
             }
             html += '</div>';
             layer.open({
@@ -49,8 +55,9 @@
             });
         }
 
-        function selectCause(val) {
-            $('#finish_fault_reason').val(val);
+        function selectCause(id, name) {
+            $('#finish_fault_reason').val(name);
+            $('#finish_fault_reason_id').val(id);
             layer.closeAll();
         }
 
@@ -58,7 +65,7 @@
         function openCategoryModal() {
             var html = '<div style="padding: 15px;">';
             for (var i = 0; i < faultTypes.length; i++) {
-                html += '<label class="checkbox-inline m-r-sm m-b-xs"><input type="checkbox" class="category-check" value="' + faultTypes[i].cause + '"> ' + faultTypes[i].cause + '</label>';
+                html += '<label class="checkbox-inline m-r-sm m-b-xs"><input type="checkbox" class="category-check" data-id="' + faultTypes[i].id + '" value="' + faultTypes[i].cause + '"> ' + faultTypes[i].cause + '</label>';
                 if ((i + 1) % 3 == 0) {
                     html += '<br>';
                 }
@@ -74,12 +81,37 @@
         }
 
         function selectCategories() {
-            var arr = [];
+            var names = [];
+            selectedFaultTypeIds = [];
             $('.category-check:checked').each(function() {
-                arr.push($(this).val());
+                names.push($(this).val());
+                selectedFaultTypeIds.push($(this).data('id'));
             });
-            $('#fault_type_display').val(arr.join('、'));
+            $('#fault_type_display').val(names.join('、'));
             layer.closeAll();
+        }
+
+        // 生成维修分析总结：串联该工单的维修过程记录
+        function genSummary() {
+            if (mainId == null || mainId == '') {
+                $.modal.alertWarning('缺少工单参数');
+                return;
+            }
+            $.ajax({
+                type: 'get',
+                url: prefix + '/genSummary?mainId=' + mainId,
+                success: function(res) {
+                    if (res.code == web_status.SUCCESS) {
+                        $('#finish_summary').val(res.data);
+                        $.modal.msgSuccess('总结生成成功，可编辑后提交');
+                    } else {
+                        $.modal.alertError(res.msg);
+                    }
+                },
+                error: function() {
+                    $.modal.alertError('生成失败，请稍后重试');
+                }
+            });
         }
 
         // 确认完工提交
@@ -100,9 +132,32 @@
                 return;
             }
             $.modal.confirm('确认该工单维修完结？', function() {
-                // TODO: 提交后端保存
-                $.modal.msgSuccess('维修完结提交成功');
-                layer.closeAll();
+                var data = {
+                    id: mainId,
+                    faultReason: $('#finish_fault_desc').text(),            // 返厂原因（工单问题描述）
+                    faultCauseId: $('#finish_fault_reason_id').val(),       // 故障原因id
+                    faultType: selectedFaultTypeIds.length > 0 ? selectedFaultTypeIds[0] : '', // 故障分类(第一个)
+                    faultTypeDesc: $('#fault_type_display').val(),          // 故障分类文本
+                    causeDesc: $('#finish_cause_desc').val(),
+                    repairDesc: $('#finish_repair_desc').val(),
+                    summary: $('#finish_summary').val()
+                };
+                $.ajax({
+                    type: 'post',
+                    url: prefix + '/finishSave',
+                    data: data,
+                    success: function(res) {
+                        if (res.code == web_status.SUCCESS) {
+                            $.modal.msgSuccess('维修完结提交成功');
+                            layer.closeAll();
+                        } else {
+                            $.modal.alertError(res.msg);
+                        }
+                    },
+                    error: function() {
+                        $.modal.alertError('提交失败，请稍后重试');
+                    }
+                });
             });
         }
     </script>

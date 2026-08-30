@@ -1,6 +1,7 @@
 package com.peng.repair.controller;
 
 import java.util.List;
+import java.util.Date;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,6 +51,7 @@ public class RepairProcessController extends BaseController
     private IFaultCauseService faultCauseService;
 
     @RequiresPermissions("repair:process:view")
+    @Log(title = "维修过程", businessType = BusinessType.OTHER)
     @GetMapping()
     public String process()
     {
@@ -60,6 +62,7 @@ public class RepairProcessController extends BaseController
      * 查询维修过程列表
      */
     @RequiresPermissions("repair:process:list")
+    @Log(title = "维修过程", businessType = BusinessType.OTHER)
     @PostMapping("/list")
     @ResponseBody
     public TableDataInfo list(RepairProcess repairProcess)
@@ -87,6 +90,7 @@ public class RepairProcessController extends BaseController
      * 查看维修过程详情（该工单的所有维修记录）
      */
     @RequiresPermissions("repair:process:view")
+    @Log(title = "维修过程", businessType = BusinessType.OTHER)
     @GetMapping("/view/{id}")
     public String view(@PathVariable("id") Long id, ModelMap mmap)
     {
@@ -100,6 +104,7 @@ public class RepairProcessController extends BaseController
      * 维修完结弹窗页面
      */
     @RequiresPermissions("repair:process:view")
+    @Log(title = "维修过程", businessType = BusinessType.OTHER)
     @GetMapping("/finish")
     public String finish(@RequestParam(value = "mainId", required = false) Long mainId, ModelMap mmap)
     {
@@ -117,9 +122,72 @@ public class RepairProcessController extends BaseController
     }
 
     /**
+     * 维修完结确认完工保存
+     */
+    @RequiresPermissions("repair:process:edit")
+    @Log(title = "维修完结", businessType = BusinessType.UPDATE)
+    @PostMapping("/finishSave")
+    @ResponseBody
+    public AjaxResult finishSave(RepairEquipment repairEquipment)
+    {
+        // 维修状态(0待开始，1维修中，2完成)：完工置 2；记录结束时间
+        repairEquipment.setRepairStatus(2L);
+        repairEquipment.setEndTime(new Date());
+        // 兼容旧状态字段（列表展示：1待开始/2维修中/3已完工）
+        repairEquipment.setStatus(3L);
+        return toAjax(repairEquipmentService.updateRepairEquipment(repairEquipment));
+    }
+
+    /**
+     * 生成维修分析总结：串联该工单的所有维修过程记录
+     */
+    @RequiresPermissions("repair:process:view")
+    @GetMapping("/genSummary")
+    @ResponseBody
+    public AjaxResult genSummary(@RequestParam(value = "mainId", required = false) Long mainId)
+    {
+        if (StringUtils.isNull(mainId))
+        {
+            return AjaxResult.error("缺少工单参数");
+        }
+        // 工单信息
+        RepairEquipment repairEquipment = repairEquipmentService.selectRepairEquipmentById(mainId);
+        // 该工单的所有维修过程记录
+        List<RepairProcess> processList = repairProcessService.selectRepairProcessListByMainId(mainId);
+
+        StringBuilder sb = new StringBuilder();
+        if (repairEquipment != null)
+        {
+            sb.append("【工单信息】").append("板型：").append(repairEquipment.getModel())
+              .append("，编号：").append(repairEquipment.getSn())
+              .append("，问题描述：").append(repairEquipment.getFaultDesc()).append("\n");
+        }
+        if (processList != null && !processList.isEmpty())
+        {
+            sb.append("【维修过程记录】\n");
+            for (int i = 0; i < processList.size(); i++)
+            {
+                RepairProcess rp = processList.get(i);
+                sb.append(i + 1).append(". ");
+                if (rp.getRecordTime() != null)
+                {
+                    sb.append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").format(rp.getRecordTime())).append(" ");
+                }
+                sb.append(rp.getMediaDesc() == null ? "" : rp.getMediaDesc()).append("\n");
+            }
+        }
+        else
+        {
+            sb.append("该工单暂无维修过程记录。");
+        }
+        return AjaxResult.success("生成成功", sb.toString());
+    }
+
+    /**
      * 新增维修过程
      */
     @RequiresPermissions("repair:process:add")
+    @Log(title = "维修过程", businessType = BusinessType.OTHER)
     @GetMapping("/add")
     public String add(@RequestParam(value = "mainId", required = false) Long mainId, ModelMap mmap)
     {
@@ -149,6 +217,7 @@ public class RepairProcessController extends BaseController
      * 修改维修过程
      */
     @RequiresPermissions("repair:process:edit")
+    @Log(title = "维修过程", businessType = BusinessType.OTHER)
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable("id") Long id, ModelMap mmap)
     {

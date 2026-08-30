@@ -1,6 +1,8 @@
 package com.peng.repair.service.impl;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.peng.repair.mapper.RepairEquipmentMapper;
@@ -17,6 +19,8 @@ import com.ruoyi.common.core.text.Convert;
 @Service
 public class RepairEquipmentServiceImpl implements IRepairEquipmentService 
 {
+    private static final Logger log = LoggerFactory.getLogger(RepairEquipmentServiceImpl.class);
+
     @Autowired
     private RepairEquipmentMapper repairEquipmentMapper;
 
@@ -65,6 +69,7 @@ public class RepairEquipmentServiceImpl implements IRepairEquipmentService
     @Override
     public int updateRepairEquipment(RepairEquipment repairEquipment)
     {
+        log.info("维修完结/修改工单 id={} 参数={}", repairEquipment.getId(), repairEquipment);
         return repairEquipmentMapper.updateRepairEquipment(repairEquipment);
     }
 

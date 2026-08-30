@@ -12,18 +12,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="faultDesc"    column="fault_desc"    />
         <result property="repairDesc"    column="repair_desc"    />
         <result property="faultReason"    column="fault_reason"    />
+        <result property="causeDesc"    column="cause_desc"    />
+        <result property="faultTypeDesc"    column="fault_type_desc"    />
         <result property="summary"    column="summary"    />
         <result property="orderTime"    column="order_time"    />
         <result property="startTime"    column="start_time"    />
         <result property="salename"    column="salename"    />
         <result property="status"    column="status"    />
+        <result property="repairStatus"    column="repair_status"    />
         <result property="endTime"    column="end_time"    />
         <result property="faultType"    column="fault_type"    />
+        <result property="faultCauseId"    column="fault_causeid"    />
         <result property="quality"    column="quality"    />
+        <result property="client"    column="client"    />
+        <result property="clientAdd"    column="client_add"    />
+        <result property="connection"    column="connection"    />
     </resultMap>
 
     <sql id="selectRepairEquipmentVo">
-        select id, model, sn, dispatch_img, fault_desc, repair_desc, fault_reason, summary, order_time, start_time, salename, status, end_time, fault_type, quality from repair_equipment
+        select id, model, sn, dispatch_img, fault_desc, repair_desc, fault_reason, cause_desc, fault_type_desc, summary, order_time, start_time, salename, status, repair_status, end_time, fault_type, fault_causeid, quality, client, client_add, connection from repair_equipment
     </sql>
 
     <select id="selectRepairEquipmentList" parameterType="RepairEquipment" resultMap="RepairEquipmentResult">
@@ -49,14 +56,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="faultDesc != null">fault_desc,</if>
             <if test="repairDesc != null">repair_desc,</if>
             <if test="faultReason != null">fault_reason,</if>
+            <if test="causeDesc != null">cause_desc,</if>
+            <if test="faultTypeDesc != null">fault_type_desc,</if>
             <if test="summary != null">summary,</if>
             <if test="orderTime != null">order_time,</if>
             <if test="startTime != null">start_time,</if>
             <if test="salename != null">salename,</if>
             <if test="status != null">status,</if>
+            <if test="repairStatus != null">repair_status,</if>
             <if test="endTime != null">end_time,</if>
             <if test="faultType != null">fault_type,</if>
+            <if test="faultCauseId != null">fault_causeid,</if>
             <if test="quality != null">quality,</if>
+            <if test="client != null">client,</if>
+            <if test="clientAdd != null">client_add,</if>
+            <if test="connection != null">connection,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="model != null">#{model},</if>
@@ -65,14 +79,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="faultDesc != null">#{faultDesc},</if>
             <if test="repairDesc != null">#{repairDesc},</if>
             <if test="faultReason != null">#{faultReason},</if>
+            <if test="causeDesc != null">#{causeDesc},</if>
+            <if test="faultTypeDesc != null">#{faultTypeDesc},</if>
             <if test="summary != null">#{summary},</if>
             <if test="orderTime != null">#{orderTime},</if>
             <if test="startTime != null">#{startTime},</if>
             <if test="salename != null">#{salename},</if>
             <if test="status != null">#{status},</if>
+            <if test="repairStatus != null">#{repairStatus},</if>
             <if test="endTime != null">#{endTime},</if>
             <if test="faultType != null">#{faultType},</if>
+            <if test="faultCauseId != null">#{faultCauseId},</if>
             <if test="quality != null">#{quality},</if>
+            <if test="client != null">#{client},</if>
+            <if test="clientAdd != null">#{clientAdd},</if>
+            <if test="connection != null">#{connection},</if>
          </trim>
     </insert>
 
@@ -85,14 +106,21 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="faultDesc != null">fault_desc = #{faultDesc},</if>
             <if test="repairDesc != null">repair_desc = #{repairDesc},</if>
             <if test="faultReason != null">fault_reason = #{faultReason},</if>
+            <if test="causeDesc != null">cause_desc = #{causeDesc},</if>
+            <if test="faultTypeDesc != null">fault_type_desc = #{faultTypeDesc},</if>
             <if test="summary != null">summary = #{summary},</if>
             <if test="orderTime != null">order_time = #{orderTime},</if>
             <if test="startTime != null">start_time = #{startTime},</if>
             <if test="salename != null">salename = #{salename},</if>
             <if test="status != null">status = #{status},</if>
+            <if test="repairStatus != null">repair_status = #{repairStatus},</if>
             <if test="endTime != null">end_time = #{endTime},</if>
             <if test="faultType != null">fault_type = #{faultType},</if>
+            <if test="faultCauseId != null">fault_causeid = #{faultCauseId},</if>
             <if test="quality != null">quality = #{quality},</if>
+            <if test="client != null">client = #{client},</if>
+            <if test="clientAdd != null">client_add = #{clientAdd},</if>
+            <if test="connection != null">connection = #{connection},</if>
         </trim>
         where id = #{id}
     </update>

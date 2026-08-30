@@ -1,6 +1,8 @@
 package com.peng.repair.service.impl;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.peng.repair.mapper.RepairProcessMapper;
@@ -17,6 +19,8 @@ import com.ruoyi.common.core.text.Convert;
 @Service
 public class RepairProcessServiceImpl implements IRepairProcessService 
 {
+    private static final Logger log = LoggerFactory.getLogger(RepairProcessServiceImpl.class);
+
     @Autowired
     private RepairProcessMapper repairProcessMapper;
 
@@ -29,6 +33,7 @@ public class RepairProcessServiceImpl implements IRepairProcessService
     @Override
     public RepairProcess selectRepairProcessById(Long id)
     {
+        log.info("查询维修过程 id={}", id);
         return repairProcessMapper.selectRepairProcessById(id);
     }
 
@@ -41,6 +46,7 @@ public class RepairProcessServiceImpl implements IRepairProcessService
     @Override
     public List<RepairProcess> selectRepairProcessList(RepairProcess repairProcess)
     {
+        log.info("查询维修过程列表 条件={}", repairProcess);
         return repairProcessMapper.selectRepairProcessList(repairProcess);
     }
 
@@ -53,6 +59,7 @@ public class RepairProcessServiceImpl implements IRepairProcessService
     @Override
     public List<RepairProcess> selectRepairProcessListByMainId(Long mainId)
     {
+        log.info("按工单查询维修记录列表 mainId={}", mainId);
         return repairProcessMapper.selectRepairProcessListByMainId(mainId);
     }
 
@@ -65,6 +72,7 @@ public class RepairProcessServiceImpl implements IRepairProcessService
     @Override
     public int insertRepairProcess(RepairProcess repairProcess)
     {
+        log.info("新增维修过程 参数={}", repairProcess);
         return repairProcessMapper.insertRepairProcess(repairProcess);
     }
 
@@ -77,6 +85,7 @@ public class RepairProcessServiceImpl implements IRepairProcessService
     @Override
     public int updateRepairProcess(RepairProcess repairProcess)
     {
+        log.info("修改维修过程 id={} 参数={}", repairProcess.getId(), repairProcess);
         return repairProcessMapper.updateRepairProcess(repairProcess);
     }
 
@@ -89,6 +98,7 @@ public class RepairProcessServiceImpl implements IRepairProcessService
     @Override
     public int deleteRepairProcessByIds(String ids)
     {
+        log.info("批量删除维修过程 ids={}", ids);
         return repairProcessMapper.deleteRepairProcessByIds(Convert.toStrArray(ids));
     }
 
@@ -101,6 +111,7 @@ public class RepairProcessServiceImpl implements IRepairProcessService
     @Override
     public int deleteRepairProcessById(Long id)
     {
+        log.info("删除维修过程 id={}", id);
         return repairProcessMapper.deleteRepairProcessById(id);
     }
 }
