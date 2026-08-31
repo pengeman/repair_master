@@ -327,7 +327,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             const mainId = urlParams.get('id');
             if (mainId) {
-                $.get('/api/repair/detailfortrack/' + mainId, function (data) {
+                $.get('/api/repair/detailfortrack/' + mainId, function (res) {
+                    let data = res.data || {};
                     $('#hint').text(`${data.salename} | ${data.model}`);
                     $('#order_time_display').text(data.order_time || '未知');
                     $('#start_time_display').text(data.start_time || '尚未开始');
@@ -336,23 +337,36 @@
             }
         }
 
+        // 媒体 URL 兼容三种历史数据：完整URL、绝对路径(/开头)、裸文件名
+        function buildMediaUrl(item) {
+            const f = item.media_file;
+             
+            if (!f) return '';
+            if (f.indexOf('http://') === 0 || f.indexOf('https://') === 0) return f;
+            if (f.indexOf('/') === 0) return f;
+            let surl =  (item.file_type === 'video' ? '/profile/video/' : '/profile/pics/') + f;
+             
+            return surl;
+        }
+
         function loadProcessHistory() {
             const urlParams = new URLSearchParams(window.location.search);
             const mainId = urlParams.get('id');
             if (mainId) {
-                $.get('/api/repair/repairProcess/' + mainId, function (data) {
-                    if (data.processes && data.processes.length > 0) {
+                $.get('/api/repair/repairProcess/' + mainId, function (res) {
+                    let processes = (res.data || {}).processes || [];
+                    if (processes.length > 0) {
                         let html = '';
-                        data.processes.forEach(function(item) {
-                            const mediaPath = item.file_type === 'video' ? '/video/' : '/pics/';
+                        processes.forEach(function(item) {
+                            const mediaUrl = buildMediaUrl(item);
                             html += `
                                 <div class="step-item">
                                     <small class="text-muted">${item.record_time}</small>
                                     <p class="fw-medium mt-1">${item.media_desc}</p>
-                                    ${item.file_type === 'video' 
-                                        ? `<video src="${mediaPath}${item.media_file}" class="media-box" controls></video>` 
-                                        : `<img src="${mediaPath}${item.media_file}" class="media-box" onclick="openImageModal(this.src)">`
-                                    }
+                                    ${mediaUrl ? (item.file_type === 'video' 
+                                        ? `<video src="${mediaUrl}" class="media-box" controls></video>` 
+                                        : `<img src="${mediaUrl}" class="media-box" onclick="openImageModal(this.src)">`)
+                                        : '<small class="text-muted">（无媒体文件）</small>'}
                                 </div>
                             `;
                         });
@@ -425,7 +439,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             const mainId = urlParams.get('id');
             if (mainId) {
-                $.get('/api/repair/detail/' + mainId, function(data) {
+                $.get('/api/repair/detail/' + mainId, function(res) {
+                    let data = res.data || {};
                     $('#current_status').text(data.status || '待开始');
                     $('#start_time_display').text(data.start_time || '尚未开始');
                 });
@@ -446,13 +461,14 @@
             if (!mainId) return alert("缺少工单ID");
 
             // 加载返厂原因
-            $.get('/api/repair/detailfortrack/' + mainId, function(data) {
+            $.get('/api/repair/detailfortrack/' + mainId, function(res) {
+                let data = res.data || {};
                 document.getElementById('finish_fault_desc').textContent = data.fault_desc || '无';
             });
 
             // 加载维修说明（media_desc 集合）
-            $.get('/api/repair/repairProcess/' + mainId, function(data) {
-                const descs = (data.processes || []).map(p => p.media_desc).filter(Boolean);
+            $.get('/api/repair/repairProcess/' + mainId, function(res) {
+                const descs = ((res.data || {}).processes || []).map(p => p.media_desc).filter(Boolean);
                 document.getElementById('finish_repair_desc').value = descs.join('；');
             });
 
