@@ -83,10 +83,6 @@
                                 <div class="info-label">开始时间</div>
                                 <div id="det-start-time" class="small text-success">-</div>
                             </div>
-                            <div class="col-6">
-                                <div class="info-label">设备质保</div>
-                                <div id="det-quility" class="fw-bold">-</div>
-                            </div>
                             <div class="col-12 border-top pt-3">
                                 <div class="info-label mb-1">故障说明</div>
                                 <p id="det-fault" class="bg-light p-2 rounded small text-secondary">--</p>
@@ -142,15 +138,23 @@
             document.body.style.overflow = '';
         }
 
+        // 媒体 URL 兼容三种历史数据：完整URL、绝对路径(/开头)、裸文件名
+        function buildMediaUrl(file) {
+            if (!file) return '';
+            if (file.indexOf('http://') === 0 || file.indexOf('https://') === 0) return file;
+            if (file.indexOf('/') === 0) return file;
+            return '/profile/pics/' + file;
+        }
+
         function loadFullDetail() {
             const mainId = new URLSearchParams(window.location.search).get('id');
             if (mainId) {
-                $.get('/api/repair/detail/' + mainId, function (data) {
+                $.get('/api/repair/detail/' + mainId, function (res) {
+                    let data = res.data || {};
                     $('#det-model').text(data.model);
                     $('#det-sn').text(data.sn);
                     $('#det-order-time').text(data.order_time);
                     $('#det-start-time').text(data.start_time || "未开工");
-                    $('#det-quility').text(data.quility == 1 ? '保内' : (data.quility == 2 ? '保外' : '-'));
                     $('#det-fault').text(data.fault_desc);
                     $('#repair_desc').text(data.repair_desc);
                     // 维修总结 = 故障原因分析 + 维修总结
@@ -158,7 +162,7 @@
                     if (data.fault_reason) parts.push('【故障分析】' + data.fault_reason);
                     if (data.summary) parts.push('【维修总结】' + data.summary);
                     $('#summary_text').text(parts.length ? parts.join('\n') : '--');
-                    $('#det-dispatch-img').attr('src', '/pics/' + data.dispatch_img);
+                    $('#det-dispatch-img').attr('src', buildMediaUrl(data.dispatch_img));
                 });
             }
         }

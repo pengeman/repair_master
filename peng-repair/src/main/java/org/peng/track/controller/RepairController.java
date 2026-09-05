@@ -1,15 +1,17 @@
 package org.peng.track.controller;
 
 import com.ruoyi.common.annotation.Anonymous;
+import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.core.domain.AjaxResult;
+import java.io.File;
 import org.peng.track.model.FaultCategory;
+import org.peng.track.model.FaultCause;
 import org.peng.track.model.RepairEquipment;
 import org.peng.track.model.RepairProcess;
 import org.peng.track.service.RepairService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +24,7 @@ import java.util.Map;
  */
 @Anonymous
 @RestController
-@RequestMapping("/repair/equipment")
+@RequestMapping("/api/repair")
 public class RepairController {
 
     @Autowired
@@ -122,7 +124,13 @@ public class RepairController {
             String fileName = null;
             if (dispatch_img != null && !dispatch_img.isEmpty()) {
                 fileName = "dispatch_" + System.currentTimeMillis();
-                dispatch_img.transferTo(new java.io.File("uploads/pics/" + fileName));
+                // 保存到 profile 指定目录下的 pics 子目录（不存在则自动创建）
+                java.io.File target = new java.io.File(RuoYiConfig.getProfile() + "/pics/" + fileName);
+                java.io.File parentDir = target.getParentFile();
+                if (parentDir != null && !parentDir.exists()){
+                    parentDir.mkdirs();
+                }
+                dispatch_img.transferTo(target);
             }
 
             RepairEquipment equipment = new RepairEquipment();
@@ -168,7 +176,19 @@ public class RepairController {
             String type = media.getContentType() != null && media.getContentType().contains("video") ? "video" : "photo";
             String subDir = type.equals("video") ? "video/" : "pics/";
             String fileName = System.currentTimeMillis() + "_" + media.getOriginalFilename();
-            media.transferTo(new java.io.File("uploads/" + subDir + fileName));
+            String file = RuoYiConfig.getProfile() + "/" + subDir + fileName;
+            System.out.println("file ： " + file);
+            
+            java.io.File newFile = new java.io.File(file);
+            // 确保上传目录存在（profile 下的 pics/video 子目录可能尚未创建）
+            java.io.File parentDir = newFile.getParentFile();
+            if (parentDir != null && !parentDir.exists()){
+                parentDir.mkdirs();
+            }
+            if (!newFile.exists()){
+                newFile.createNewFile();
+            }
+            media.transferTo(newFile);
 
             RepairProcess process = new RepairProcess();
             process.setMainId(mainId);
@@ -266,11 +286,27 @@ public class RepairController {
     }
 
     /**
+     * 获取所有故障原因
+     */
+    @GetMapping("/fault-causes")
+    public AjaxResult faultCauses() {
+        try {
+            List<FaultCause> list = repairService.getAllFaultCauses();
+            return AjaxResult.success(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return AjaxResult.error("查询失败");
+        }
+    }
+
+    /**
      * 获取未完工工单列表
      */
     @GetMapping("/unlist")
     public AjaxResult unfinishedList() {
+        //System.out.println("unfinishedList ...........");
         List<Map<String, Object>> list = repairService.getAllUnfinished();
+        //System.out.println("repairService.getAllUnfinished : " + list);
         return AjaxResult.success(list);
     }
 

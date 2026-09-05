@@ -170,10 +170,6 @@
                 <span class="input-group-text">开始时间</span>
                 <span class="form-control bg-white" id="start_time_display">尚未开始</span>
             </div>
-            <div class="input-group mb-2">
-                <span class="input-group-text">设备质保</span>
-                <span class="form-control bg-white" id="quility_display">-</span>
-            </div>
         </div>
 
         <div class="track-card border-top border-primary border-4">
@@ -181,13 +177,7 @@
             <form id="processForm" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="small fw-bold">拍照/视频：</label>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-outline-primary flex-1 fw-bold" onclick="document.getElementById('media_camera').click()">📷 拍照</button>
-                        <button type="button" class="btn btn-outline-secondary flex-1 fw-bold" onclick="document.getElementById('media_file').click()">📁 选择文件</button>
-                    </div>
-                    <input type="file" name="media" id="media_camera" class="d-none" accept="image/*,video/*" capture="environment">
-                    <input type="file" name="media" id="media_file" class="d-none" accept="image/*,video/*">
-                    <div id="selected_file_info" class="small text-muted mt-2 d-none"></div>
+                    <input type="file" name="media" id="media_input" class="form-control" accept="image/*,video/*" capture="camera">
                     <small class="text-muted compress-info" id="compress_hint">图片将自动压缩，确保小于300KB</small>
                 </div>
                 <div class="mb-3">
@@ -229,18 +219,15 @@
                 <div class="form-control-static" id="finish_fault_desc"></div>
 
                 <label class="form-label">② 故障原因分析</label>
-                <input type="text" class="form-control" id="finish_fault_reason" placeholder="点击选择故障原因" readonly onclick="openCauseModal()">
+                <textarea class="form-control" id="finish_fault_reason" rows="2" placeholder="请分析故障原因"></textarea>
 
-                <label class="form-label">③ 原因描述</label>
-                <textarea class="form-control" id="finish_cause_desc" rows="2" placeholder="请输入详细原因描述"></textarea>
-
-                <label class="form-label">④ 故障分类 <small class="text-muted">（点击选择，可多选）</small></label>
+                <label class="form-label">③ 故障分类 <small class="text-muted">（点击选择，可多选）</small></label>
                 <input type="text" class="form-control" id="fault_type_display" placeholder="点击选择故障分类" readonly onclick="openCategoryModal()">
 
-                <label class="form-label">⑤ 维修说明</label>
+                <label class="form-label">④ 维修说明</label>
                 <textarea class="form-control" id="finish_repair_desc" rows="2" placeholder="维修说明将自动填充"></textarea>
 
-                <label class="form-label">⑥ 维修总结</label>
+                <label class="form-label">⑤ 维修总结</label>
                 <textarea class="form-control" id="finish_summary" rows="2" placeholder="请输入维修总结"></textarea>
 
                 <button type="button" class="btn btn-dark w-100 fw-bold mt-4" onclick="submitFinish()">确认完工</button>
@@ -254,15 +241,6 @@
             <h6 class="fw-bold mb-3">选择故障分类（可多选）</h6>
             <div id="categoryList"></div>
             <button class="btn btn-primary w-100 mt-3" onclick="confirmCategorySelection()">确定</button>
-        </div>
-    </div>
-
-    <!-- 故障原因选择弹窗 -->
-    <div class="cat-overlay" id="causeOverlay" onclick="if(event.target===this)closeCauseModal()">
-        <div class="cat-modal">
-            <h6 class="fw-bold mb-3">选择故障原因（单选）</h6>
-            <div id="causeList"></div>
-            <button class="btn btn-primary w-100 mt-3" onclick="confirmCauseSelection()">确定</button>
         </div>
     </div>
 
@@ -354,7 +332,7 @@
                     $('#hint').text(`${data.salename} | ${data.model}`);
                     $('#order_time_display').text(data.order_time || '未知');
                     $('#start_time_display').text(data.start_time || '尚未开始');
-                    $('#current_status').text(data.repair_status);
+                    $('#current_status').text(data.status);
                 });
             }
         }
@@ -362,10 +340,13 @@
         // 媒体 URL 兼容三种历史数据：完整URL、绝对路径(/开头)、裸文件名
         function buildMediaUrl(item) {
             const f = item.media_file;
+             
             if (!f) return '';
             if (f.indexOf('http://') === 0 || f.indexOf('https://') === 0) return f;
             if (f.indexOf('/') === 0) return f;
-            return (item.file_type === 'video' ? '/profile/video/' : '/profile/pics/') + f;
+            let surl =  (item.file_type === 'video' ? '/profile/video/' : '/profile/pics/') + f;
+             
+            return surl;
         }
 
         function loadProcessHistory() {
@@ -397,62 +378,50 @@
             }
         }
 
-        function handleMediaChange(e) {
+        document.getElementById('media_input').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const hint = document.getElementById('compress_hint');
-            const fileInfo = document.getElementById('selected_file_info');
-            fileInfo.textContent = `已选择: ${file.name}`;
-            fileInfo.classList.remove('d-none');
-
             if (file.type.startsWith('image/')) {
                 hint.textContent = '正在压缩图片...';
-                compressImage(file).then(compressed => {
-                    if (compressed.size < file.size) {
-                        const newFile = new File([compressed], file.name, { type: 'image/jpeg' });
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(newFile);
-                        e.target.files = dataTransfer.files;
-                        hint.textContent = `压缩完成: ${(compressed.size / 1024).toFixed(1)}KB`;
-                    } else {
-                        hint.textContent = `原图大小: ${(file.size / 1024).toFixed(1)}KB，无需压缩`;
-                    }
-                });
+                const compressed = await compressImage(file);
+
+                if (compressed.size < file.size) {
+                    const newFile = new File([compressed], file.name, { type: 'image/jpeg' });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(newFile);
+                    e.target.files = dataTransfer.files;
+                    hint.textContent = `压缩完成: ${(compressed.size / 1024).toFixed(1)}KB`;
+                } else {
+                    hint.textContent = `原图大小: ${(file.size / 1024).toFixed(1)}KB，无需压缩`;
+                }
             } else {
                 hint.textContent = `视频大小: ${(file.size / 1024).toFixed(1)}KB`;
             }
-        }
-
-        document.getElementById('media_camera').addEventListener('change', handleMediaChange);
-        document.getElementById('media_file').addEventListener('change', handleMediaChange);
+        });
 
         document.getElementById('uploadBtn').addEventListener('click', async function() {
             const urlParams = new URLSearchParams(window.location.search);
             const mainId = urlParams.get('id');
-            const cameraInput = document.getElementById('media_camera');
-            const fileInput = document.getElementById('media_file');
+            const fileInput = document.querySelector('input[name="media"]');
             const descInput = document.querySelector('input[name="desc"]');
 
-            const selectedInput = cameraInput.files.length > 0 ? cameraInput : (fileInput.files.length > 0 ? fileInput : null);
-
-            if (!selectedInput || !descInput.value.trim()) return alert("请拍摄/选择图片并输入描述");
+            if (!fileInput.files.length || !descInput.value.trim()) return alert("请拍摄并输入描述");
 
             const btn = document.getElementById('uploadBtn');
             btn.disabled = true;
             btn.textContent = '上传中...';
 
             const formData = new FormData();
-            formData.append('media', selectedInput.files[0]);
+            formData.append('media', fileInput.files[0]);
             formData.append('desc', descInput.value);
 
             fetch(`/api/repair/add-process/${mainId}`, { method: 'POST', body: formData })
                 .then(res => {
                     if (res.ok) {
                         descInput.value = '';
-                        cameraInput.value = '';
                         fileInput.value = '';
-                        document.getElementById('selected_file_info').classList.add('d-none');
                         document.getElementById('compress_hint').textContent = '图片将自动压缩，确保小于300KB';
                         loadProcessHistory();
                         updateStatusDisplay();
@@ -472,7 +441,7 @@
             if (mainId) {
                 $.get('/api/repair/detail/' + mainId, function(res) {
                     let data = res.data || {};
-                    $('#current_status').text(data.repair_status || '待开始');
+                    $('#current_status').text(data.status || '待开始');
                     $('#start_time_display').text(data.start_time || '尚未开始');
                 });
             }
@@ -519,28 +488,23 @@
         }
 
         // ===== 故障分类弹窗 =====
-        let selectedCategoryIds = [];
-        let faultCategoriesCache = [];
+        let selectedCategories = [];
 
         function openCategoryModal() {
-            // 从显示文本回显已选中的 ID（从缓存中查找）
-            const displayText = document.getElementById('fault_type_display').value || '';
-            selectedCategoryIds = faultCategoriesCache
-                .filter(c => displayText.includes(c.cause))
-                .map(c => c.id);
-
-            fetch('/api/repair/fault-causes')
+            selectedCategories = (document.getElementById('fault_type_display').value || '')
+                .split(/[,，\s]+/).filter(Boolean);
+            
+            fetch('/api/repair/fault-categories')
                 .then(res => res.json())
-                .then(res => {
-                    faultCategoriesCache = res.data || [];
+                .then(data => {
                     const list = document.getElementById('categoryList');
                     list.innerHTML = '';
-                    faultCategoriesCache.forEach(cat => {
-                        const checked = selectedCategoryIds.includes(cat.id) ? 'checked' : '';
+                    data.forEach(cat => {
+                        const checked = selectedCategories.includes(cat.name) ? 'checked' : '';
                         list.innerHTML += `
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="fault_type_radio" value="${cat.id}" id="cat_${cat.id}" ${checked}>
-                                <label class="form-check-label" for="cat_${cat.id}">${cat.cause}</label>
+                                <input class="form-check-input" type="checkbox" value="${cat.name}" id="cat_${cat.id}" ${checked}>
+                                <label class="form-check-label" for="cat_${cat.id}">${cat.name}</label>
                             </div>`;
                     });
                     document.getElementById('catOverlay').classList.add('active');
@@ -552,51 +516,10 @@
         }
 
         function confirmCategorySelection() {
-            const checked = document.querySelector('#categoryList .form-check-input:checked');
-            if (checked) {
-                const id = parseInt(checked.value);
-                selectedCategoryIds = [id];
-                const cat = faultCategoriesCache.find(c => c.id === id);
-                document.getElementById('fault_type_display').value = cat ? cat.cause : '';
-            }
+            const checks = document.querySelectorAll('#categoryList .form-check-input:checked');
+            const names = Array.from(checks).map(cb => cb.value);
+            document.getElementById('fault_type_display').value = names.join('、');
             closeCategoryModal();
-        }
-
-        // ===== 故障原因弹窗 =====
-        let selectedCause = '';
-
-        function openCauseModal() {
-            selectedCause = document.getElementById('finish_fault_reason').value || '';
-            
-            fetch('/api/repair/fault-categories')
-                .then(res => res.json())
-                .then(res => {
-                    const data = res.data || [];
-                    const list = document.getElementById('causeList');
-                    list.innerHTML = '';
-                    data.forEach(cause => {
-                        const checked = selectedCause === cause.name ? 'checked' : '';
-                        list.innerHTML += `
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="fault_cause" value="${cause.name}" id="cause_${cause.id}" ${checked}>
-                                <label class="form-check-label" for="cause_${cause.id}">${cause.name}</label>
-                            </div>`;
-                    });
-                    document.getElementById('causeOverlay').classList.add('active');
-                });
-        }
-
-        function closeCauseModal() {
-            document.getElementById('causeOverlay').classList.remove('active');
-        }
-
-        function confirmCauseSelection() {
-            const radio = document.querySelector('#causeList .form-check-input:checked');
-            if (radio) {
-                selectedCause = radio.value;
-                document.getElementById('finish_fault_reason').value = selectedCause;
-            }
-            closeCauseModal();
         }
 
         // ===== 提交完工 =====
@@ -604,14 +527,12 @@
             const urlParams = new URLSearchParams(window.location.search);
             const mainId = urlParams.get('id');
             
-            const faultCause = document.getElementById('finish_fault_reason').value.trim();
-            const causeDesc = document.getElementById('finish_cause_desc').value.trim();
-            const faultReason = faultCause + (causeDesc ? '；' + causeDesc : '');
-            const faultType = selectedCategoryIds.length > 0 ? selectedCategoryIds[0] : '';
+            const faultReason = document.getElementById('finish_fault_reason').value.trim();
+            const faultType = document.getElementById('fault_type_display').value.trim();
             const repairDesc = document.getElementById('finish_repair_desc').value.trim();
             const summary = document.getElementById('finish_summary').value.trim();
 
-            if (!faultCause) return alert('请选择故障原因');
+            if (!faultReason) return alert('请填写故障原因分析');
             if (!faultType) return alert('请选择故障分类');
             if (!summary) return alert('请填写维修总结');
 

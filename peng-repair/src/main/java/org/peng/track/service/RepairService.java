@@ -1,6 +1,7 @@
 package org.peng.track.service;
 
 import org.peng.track.model.FaultCategory;
+import org.peng.track.model.FaultCause;
 import org.peng.track.model.RepairEquipment;
 import org.peng.track.model.RepairProcess;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,11 @@ public class RepairService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * 新增报修工单
+     * repair_status 维修状态(0待开始，1维修中，2完成)
+
+     */
     public int createRepair(RepairEquipment equipment) {
         String sql = "INSERT INTO repair_equipment (salename, model, sn, fault_desc, repair_desc, dispatch_img, order_time, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -34,7 +40,7 @@ public class RepairService {
             ps.setString(5, equipment.getRepairDesc());
             ps.setString(6, equipment.getDispatchImg());
             ps.setString(7, equipment.getOrderTime());
-            ps.setString(8, "待开始");
+            ps.setString(8, "0"); //"待开始"
             return ps;
         }, keyHolder);
         Number key = keyHolder.getKey();
@@ -110,8 +116,12 @@ public class RepairService {
     }
 
     public List<Map<String, Object>> getAllUnfinished() {
-        return jdbcTemplate.queryForList(
-            "SELECT id, model, sn, order_time, start_time, salename, status FROM repair_equipment WHERE status <> 2 ORDER BY id DESC");
+        String sql = "SELECT id, model, sn, quality, order_time, start_time, salename, status FROM repair_equipment WHERE repair_status <> 2 ORDER BY id DESC";
+        //System.out.println("getAllUnfinished: " + sql);
+        List<Map<String, Object>> unfinishedList= jdbcTemplate.queryForList(sql);
+        //System.out.println("unfinishedList: " + unfinishedList);
+        return unfinishedList;
+            
     }
 
     public List<RepairProcess> getProcessesByMainId(int mainId) {
@@ -132,7 +142,7 @@ public class RepairService {
 
     public void saveSummaryAndFinish(int id, String summary, String faultReason, String faultType, String repairDesc) {
         jdbcTemplate.update(
-            "UPDATE repair_equipment SET summary = ?, fault_reason = ?, fault_type = ?, repair_desc = ?, end_time = NOW(), status = 2 WHERE id = ?",
+            "UPDATE repair_equipment SET summary = ?, fault_reason = ?, fault_type = ?, repair_desc = ?, end_time = NOW(), repair_status = 2 WHERE id = ?",
             summary, faultReason, faultType, repairDesc, id);
     }
 
@@ -146,6 +156,15 @@ public class RepairService {
         return jdbcTemplate.query(
             "SELECT id, name FROM fault_categories ORDER BY id",
             (rs, rowNum) -> new FaultCategory(rs.getInt("id"), rs.getString("name")));
+    }
+
+    /**
+     * 查询所有故障原因
+     */
+    public List<FaultCause> getAllFaultCauses() {
+        return jdbcTemplate.query(
+            "SELECT id, cause FROM fault_cause ORDER BY id",
+            (rs, rowNum) -> new FaultCause(rs.getInt("id"), rs.getString("cause")));
     }
 
     public String generateSummary(int id) {
