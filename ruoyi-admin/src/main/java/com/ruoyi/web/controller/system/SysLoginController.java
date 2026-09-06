@@ -48,6 +48,12 @@ public class SysLoginController extends BaseController
         {
             return ServletUtils.renderString(response, "{\"code\":\"1\",\"msg\":\"未登录或登录超时。请重新登录\"}");
         }
+        // 手机端访问，直接跳转到手机端首页
+        String userAgent = request.getHeader("User-Agent");
+        if (StringUtils.isNotEmpty(userAgent) && ServletUtils.checkAgentIsMobile(userAgent))
+        {
+            return "redirect:/index.html";
+        }
         // 是否开启记住我
         mmap.put("isRemembered", rememberMe);
         // 是否开启用户注册

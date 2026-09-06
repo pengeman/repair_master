@@ -45,9 +45,28 @@ public class SysIndexController extends BaseController
     private SysPasswordService passwordService;
 
     // 系统首页
+    @GetMapping("/")
+    public String root(HttpServletRequest request)
+    {
+        // 手机端访问，直接跳转到手机端首页
+        String userAgent = request.getHeader("User-Agent");
+        if (StringUtils.isNotEmpty(userAgent) && ServletUtils.checkAgentIsMobile(userAgent))
+        {
+            return "redirect:/index.html";
+        }
+        return "redirect:/index";
+    }
+
+    // 系统首页
     @GetMapping("/index")
     public String index(ModelMap mmap, HttpServletRequest request)
     {
+        // 手机端访问，直接跳转到手机端首页
+        String userAgent = request.getHeader("User-Agent");
+        if (StringUtils.isNotEmpty(userAgent) && ServletUtils.checkAgentIsMobile(userAgent))
+        {
+            return "redirect:/index.html";
+        }
         // 取身份信息
         SysUser user = getSysUser();
         // 根据用户id取出菜单
