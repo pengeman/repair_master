@@ -89,7 +89,7 @@ public class RepairService {
     public RepairEquipment getById(int id) {
         List<RepairEquipment> list = jdbcTemplate.query(
             "SELECT id, model, sn, dispatch_img, fault_desc, repair_desc, fault_reason, summary, " +
-            " order_time,   start_time, salename, status " +
+            " order_time,   start_time, salename, status,quality " +
             "FROM repair_equipment WHERE id = ?",
             (rs, rowNum) -> {
                 RepairEquipment e = new RepairEquipment();
@@ -105,6 +105,7 @@ public class RepairService {
                 e.setStartTime(rs.getString("start_time"));
                 e.setSalename(rs.getString("salename"));
                 e.setStatus(rs.getString("status"));
+                e.setQuality(rs.getInt("quality"));
                 return e;
             }, id);
         return list.isEmpty() ? null : list.get(0);

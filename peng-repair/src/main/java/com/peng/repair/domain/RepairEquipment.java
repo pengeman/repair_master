@@ -84,6 +84,10 @@ public class RepairEquipment extends BaseEntity
     @Excel(name = "质保期")
     private Long quality;
 
+    /** 工单属性：1返厂 2外派 */
+    @Excel(name = "工单属性")
+    private Long dispatchProp;
+
     /** 客户 */
     @Excel(name = "客户")
     private String client;
@@ -281,9 +285,19 @@ public class RepairEquipment extends BaseEntity
         this.quality = quality;
     }
 
-    public Long getQuality() 
+    public Long getQuality()
     {
         return quality;
+    }
+
+    public void setDispatchProp(Long dispatchProp)
+    {
+        this.dispatchProp = dispatchProp;
+    }
+
+    public Long getDispatchProp()
+    {
+        return dispatchProp;
     }
 
     public void setClient(String client) 

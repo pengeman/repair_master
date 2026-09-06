@@ -132,8 +132,9 @@
                     <label class="col-sm-4 control-label">工单：</label>
                     <div class="col-sm-8">
                         <input th:value="*{dispatchImg}" class="form-control" type="text" readonly>
-                        <img class="detail-img" th:src="@{'/profile/' + repairEquipment.dispatchImg}" alt="工单图片" onclick="window.open(this.src)">
-                        <div class="img-hint" th:text="${repairEquipment.dispatchImg}"></div>
+<!--                        <img class="detail-img" th:src="@{'/profile/pics/' + repairEquipment.dispatchImg}" alt="工单图片" onclick="window.open(this.src)">-->
+                        <img class="detail-img" th:src="${repairEquipment.dispatchImg}" alt="工单图片222" onclick="window.open(this.src)">
+                        <div class="img-hint" th:text= "${repairEquipment.dispatchImg}"></div>
                     </div>
                 </div>
             </div>

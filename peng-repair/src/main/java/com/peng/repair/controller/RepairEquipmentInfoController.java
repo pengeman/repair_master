@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
@@ -24,8 +25,8 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.multipart.MultipartFile;
+import com.ruoyi.common.config.RuoYiConfig;
 
 /**
  * 工单维护Controller
@@ -114,6 +115,54 @@ public class RepairEquipmentInfoController extends BaseController
         RepairEquipment repairEquipment = repairEquipmentService.selectRepairEquipmentById(id);
         mmap.put("repairEquipment", repairEquipment);
         return prefix + "/detail";
+    }
+
+    /**
+     * 新增工单页面
+     */
+    @RequiresPermissions("system:equipmentinfo:add")
+    @GetMapping("/add")
+    public String add()
+    {
+        return prefix + "/add";
+    }
+
+    /**
+     * 新增保存工单（含 dispatch_img 文件上传 + dispatch_prop）
+     */
+    @RequiresPermissions("system:equipmentinfo:add")
+    @Log(title = "工单维护", businessType = BusinessType.INSERT)
+    @PostMapping("/add")
+    @ResponseBody
+    public AjaxResult addSave(RepairEquipment repairEquipment,
+            @RequestParam(value = "dispatchImgFile", required = false) MultipartFile dispatchImgFile)
+    {
+        if (dispatchImgFile != null && !dispatchImgFile.isEmpty())
+        {
+            try
+            {
+                String ext = "";
+                String originalName = dispatchImgFile.getOriginalFilename();
+                if (originalName != null && originalName.contains(".")) {
+                    ext = originalName.substring(originalName.lastIndexOf("."));
+                }
+                String fileName = "dispatch_" + System.currentTimeMillis() + ext;
+                java.io.File target = new java.io.File(RuoYiConfig.getProfile() + "/pics/" + fileName);
+                java.io.File parentDir = target.getParentFile();
+                if (parentDir != null && !parentDir.exists())
+                {
+                    parentDir.mkdirs();
+                }
+                dispatchImgFile.transferTo(target);
+                repairEquipment.setDispatchImg(fileName);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                return error("工单图片上传失败");
+            }
+        }
+        return toAjax(repairEquipmentService.insertRepairEquipment(repairEquipment));
     }
 
     /**

@@ -9,7 +9,7 @@
         <div class="toolbar" style="margin-bottom: 10px;">
             <a class="btn btn-primary" onclick="importData()"><i class="fa fa-upload"></i> 导入数据</a>
         </div>
-        <form class="form-horizontal m" id="form-equipment-add">
+        <form class="form-horizontal m" id="form-equipment-add" enctype="multipart/form-data">
             <div class="col-sm-6">
                 <div class="form-group">
                     <label class="col-sm-4 control-label">业务员：</label>
@@ -70,15 +70,29 @@
                 <div class="form-group">
                     <label class="col-sm-4 control-label">质保期：</label>
                     <div class="col-sm-8">
-                        <input name="quality" class="form-control" type="text">
+                        <select name="quality" class="form-control">
+                            <option value="1">保内</option>
+                            <option value="2">保外</option>
+                        </select>
                     </div>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="form-group">
-                    <label class="col-sm-4 control-label">工单：</label>
+                    <label class="col-sm-4 control-label">工单属性：</label>
                     <div class="col-sm-8">
-                        <input name="dispatchImg" class="form-control" type="text">
+                        <select name="dispatchProp" class="form-control">
+                            <option value="1">返厂</option>
+                            <option value="2">外派</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">工单图片：</label>
+                    <div class="col-sm-8">
+                        <input name="dispatchImgFile" class="form-control" type="file" accept="image/*">
                     </div>
                 </div>
             </div>
@@ -91,23 +105,23 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6">
+<!--            <div class="col-sm-6">
                 <div class="form-group">
                     <label class="col-sm-4 control-label">问题原因：</label>
                     <div class="col-sm-8">
                         <input name="faultReason" class="form-control" type="text">
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-6">
+            </div>-->
+<!--            <div class="col-sm-6">
                 <div class="form-group">
                     <label class="col-sm-4 control-label">总结：</label>
                     <div class="col-sm-8">
                         <input name="summary" class="form-control" type="text">
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-6">
+            </div>-->
+<!--            <div class="col-sm-6">
                 <div class="form-group">
                     <label class="col-sm-4 control-label">工单时间：</label>
                     <div class="col-sm-8">
@@ -117,8 +131,8 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-6">
+            </div>-->
+<!--            <div class="col-sm-6">
                 <div class="form-group">
                     <label class="col-sm-4 control-label">开工时间：</label>
                     <div class="col-sm-8">
@@ -128,9 +142,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
             
-            <div class="col-sm-6">
+<!--            <div class="col-sm-6">
                 <div class="form-group">
                     <label class="col-sm-4 control-label">结束时间：</label>
                     <div class="col-sm-8">
@@ -140,7 +154,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
             
             
             
@@ -156,7 +170,26 @@
 
         function submitHandler() {
             if ($.validate.form()) {
-                $.operate.save(prefix + "/add", $('#form-equipment-add').serialize());
+                var formData = new FormData($('#form-equipment-add')[0]);
+                $.ajax({
+                    url: prefix + '/add',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(res) {
+                        if (res.code == 0) {
+                            $.modal.msgSuccess('保存成功');
+                            $.modal.closeAll();
+                            $.table.refresh();
+                        } else {
+                            $.modal.alertError(res.msg);
+                        }
+                    },
+                    error: function() {
+                        $.modal.alertError('保存失败，请稍后重试');
+                    }
+                });
             }
         }
 
@@ -193,7 +226,7 @@
                     var row = rows[0];
                     console.log(row);
                     var fields = ['salename', 'client', 'clientAdd', 'connection', 'model', 'sn', 'faultDesc', 'quality', 'dispatchImg', 'repairDesc', 'faultReason', 'summary', 'orderTime', 'startTime', 'endTime'];
-                    var fields_hz = ['创建人','客户','客户地址','联系人','板型','出厂编号','故障描述','质保期','工单','维修描述','故障原因','总结','工单日期','开工日期','结束日期'];
+                    var fields_hz = ['创建人','售后服务客户名称','客户地址','联系人','板型','出厂编号','故障描述','质保期','工单','维修描述','故障原因','总结','工单日期','开工日期','结束日期'];
                     for (var i = 0; i < fields_hz.length; i++) {
                         var name_hz = fields_hz[i];
                         var name = fields[i];

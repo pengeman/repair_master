@@ -24,13 +24,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="faultType"    column="fault_type"    />
         <result property="faultCauseId"    column="fault_causeid"    />
         <result property="quality"    column="quality"    />
+        <result property="dispatchProp"    column="dispatch_prop"    />
         <result property="client"    column="client"    />
         <result property="clientAdd"    column="client_add"    />
         <result property="connection"    column="connection"    />
     </resultMap>
 
     <sql id="selectRepairEquipmentVo">
-        select id, model, sn, dispatch_img, fault_desc, repair_desc, fault_reason, cause_desc, fault_type_desc, summary, order_time, start_time, salename, status, repair_status, end_time, fault_type, fault_causeid, quality, client, client_add, connection from repair_equipment
+        select id, model, sn, dispatch_img, fault_desc, repair_desc, fault_reason, cause_desc, fault_type_desc, summary, order_time, start_time, salename, status, repair_status, end_time, fault_type, fault_causeid, quality, dispatch_prop, client, client_add, connection from repair_equipment
     </sql>
 
     <select id="selectRepairEquipmentList" parameterType="RepairEquipment" resultMap="RepairEquipmentResult">
@@ -68,6 +69,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="faultType != null">fault_type,</if>
             <if test="faultCauseId != null">fault_causeid,</if>
             <if test="quality != null">quality,</if>
+            <if test="dispatchProp != null">dispatch_prop,</if>
             <if test="client != null">client,</if>
             <if test="clientAdd != null">client_add,</if>
             <if test="connection != null">connection,</if>
@@ -91,6 +93,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="faultType != null">#{faultType},</if>
             <if test="faultCauseId != null">#{faultCauseId},</if>
             <if test="quality != null">#{quality},</if>
+            <if test="dispatchProp != null">#{dispatchProp},</if>
             <if test="client != null">#{client},</if>
             <if test="clientAdd != null">#{clientAdd},</if>
             <if test="connection != null">#{connection},</if>
@@ -118,6 +121,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="faultType != null">fault_type = #{faultType},</if>
             <if test="faultCauseId != null">fault_causeid = #{faultCauseId},</if>
             <if test="quality != null">quality = #{quality},</if>
+            <if test="dispatchProp != null">dispatch_prop = #{dispatchProp},</if>
             <if test="client != null">client = #{client},</if>
             <if test="clientAdd != null">client_add = #{clientAdd},</if>
             <if test="connection != null">connection = #{connection},</if>

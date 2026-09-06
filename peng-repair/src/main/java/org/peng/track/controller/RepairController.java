@@ -64,6 +64,7 @@ public class RepairController {
             result.put("dispatch_img", equipment.getDispatchImg());
             result.put("status", equipment.getStatus());
             result.put("salename", equipment.getSalename());
+            result.put("quality", equipment.getQuality());
 
             List<RepairProcess> processes = repairService.getProcessesByMainId(id.intValue());
             List<Map<String, Object>> processList = processes.stream().map(p -> {
@@ -225,6 +226,7 @@ public class RepairController {
             result.put("id", equipment.getId());
             result.put("device_model", equipment.getModel());
             result.put("device_sn", equipment.getSn());
+            result.put("quality", equipment.getQuality());
             result.put("dispatch_img", equipment.getDispatchImg());
             result.put("fault_desc", equipment.getFaultDesc());
             result.put("repair_desc", equipment.getRepairDesc());

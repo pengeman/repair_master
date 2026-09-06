@@ -145,20 +145,25 @@
         function loadFullDetail() {
             const mainId = new URLSearchParams(window.location.search).get('id');
             if (mainId) {
-                $.get('/api/repair/detail/' + mainId, function (data) {
+                $.get('/api/repair/detail/' + mainId, function (res) {
+                    let data = res.data || {};
                     $('#det-model').text(data.model);
                     $('#det-sn').text(data.sn);
                     $('#det-order-time').text(data.order_time);
                     $('#det-start-time').text(data.start_time || "未开工");
-                    $('#det-quility').text(data.quility == 1 ? '保内' : (data.quility == 2 ? '保外' : '-'));
+                    $('#det-quility').text(data.quality == 1 ? '保内' : (data.quality == 2 ? '保外' : '-'));
                     $('#det-fault').text(data.fault_desc);
                     $('#repair_desc').text(data.repair_desc);
-                    // 维修总结 = 故障原因分析 + 维修总结
                     let parts = [];
                     if (data.fault_reason) parts.push('【故障分析】' + data.fault_reason);
                     if (data.summary) parts.push('【维修总结】' + data.summary);
                     $('#summary_text').text(parts.length ? parts.join('\n') : '--');
-                    $('#det-dispatch-img').attr('src', '/pics/' + data.dispatch_img);
+                    var file = data.dispatch_img || '';
+                    if (file.startsWith('http') || file.startsWith('/')) {
+                        $('#det-dispatch-img').attr('src', file);
+                    } else {
+                        $('#det-dispatch-img').attr('src', '/profile/pics/' + file);
+                    }
                 });
             }
         }

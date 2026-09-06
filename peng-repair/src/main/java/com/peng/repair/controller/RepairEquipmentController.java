@@ -22,8 +22,11 @@ import com.peng.repair.service.IRepairEquipmentService;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.common.config.RuoYiConfig;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestParam;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -61,6 +64,8 @@ public class RepairEquipmentController extends BaseController
         List<RepairEquipment> list = repairEquipmentService.selectRepairEquipmentList(repairEquipment);
         for (RepairEquipment repairEquipment1 : list){
             repairEquipment1.setSalename(repairEquipment1.getSalename() + "/" + repairEquipment1.getClient());
+            String imgfile = repairEquipment1.getDispatchImg();
+            System.out.println("imgfile ： " + imgfile);
         }
         return getDataTable(list);
     }
@@ -202,14 +207,41 @@ public class RepairEquipmentController extends BaseController
     }
 
     /**
-     * 新增保存工单维护
+     * 新增保存工单维护（含 dispatch_img 文件上传）
      */
     @RequiresPermissions("system:equipment:add")
     @Log(title = "工单维护", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(RepairEquipment repairEquipment)
+    public AjaxResult addSave(RepairEquipment repairEquipment,
+            @RequestParam(value = "dispatchImgFile", required = false) MultipartFile dispatchImgFile)
     {
+        repairEquipment.setOrderTime(new Date());
+        if (dispatchImgFile != null && !dispatchImgFile.isEmpty())
+        {
+            try
+            {
+                String ext = "";
+                String originalName = dispatchImgFile.getOriginalFilename();
+                if (originalName != null && originalName.contains("."))
+                {
+                    ext = originalName.substring(originalName.lastIndexOf("."));
+                }
+                String fileName = "dispatch_" + System.currentTimeMillis() + ext;
+                java.io.File target = new java.io.File(RuoYiConfig.getProfile() + "/pics/" + fileName);
+                java.io.File parentDir = target.getParentFile();
+                if (parentDir != null && !parentDir.exists())
+                {
+                    parentDir.mkdirs();
+                }
+                dispatchImgFile.transferTo(target);
+                repairEquipment.setDispatchImg(fileName);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
         return toAjax(repairEquipmentService.insertRepairEquipment(repairEquipment));
     }
 

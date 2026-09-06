@@ -16,6 +16,7 @@ public class RepairEquipment     extends Object
     private String salename;
     private String status;
     private String faultType;
+    private Integer quality;
 
     public RepairEquipment() {}
 
@@ -60,6 +61,9 @@ public class RepairEquipment     extends Object
 
     public String getFaultType() { return faultType; }
     public void setFaultType(String faultType) { this.faultType = faultType; }
+
+    public Integer getQuality() { return quality; }
+    public void setQuality(Integer quality) { this.quality = quality; }
     
     @Override
     public String         toString(){
