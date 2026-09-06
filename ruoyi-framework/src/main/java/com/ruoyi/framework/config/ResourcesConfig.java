@@ -31,11 +31,11 @@ public class ResourcesConfig implements WebMvcConfigurer
 
     /**
      * 默认首页的设置，当输入域名是可以自动跳转到默认指定的网页
+     * （根路径 "/" 已由 SysIndexController.root 处理：手机端跳手机首页，桌面端跳 /index）
      */
     @Override
     public void addViewControllers(ViewControllerRegistry registry)
     {
-        registry.addViewController("/").setViewName("forward:" + indexUrl);
     }
 
     @Override

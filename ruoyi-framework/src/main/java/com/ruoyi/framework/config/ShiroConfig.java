@@ -324,7 +324,18 @@ public class ShiroConfig
         // 不需要拦截的访问
         filterChainDefinitionMap.put("/login", "anon,captchaValidate");
         filterChainDefinitionMap.put("/api/login", "anon");
-        filterChainDefinitionMap.put("/repair/equipment/**", "anon");
+        // 手机端 API 与页面（无需登录）
+        filterChainDefinitionMap.put("/api/repair/**", "anon");
+        filterChainDefinitionMap.put("/", "anon");
+        filterChainDefinitionMap.put("/index.html", "anon");
+        filterChainDefinitionMap.put("/track.html", "anon");
+        filterChainDefinitionMap.put("/create.html", "anon");
+        filterChainDefinitionMap.put("/view_repair.html", "anon");
+        filterChainDefinitionMap.put("/processhistory.html", "anon");
+        filterChainDefinitionMap.put("/index2.html", "anon");
+        filterChainDefinitionMap.put("/home.png", "anon");
+        // 上传文件资源（profile 目录：维修图片/视频/派工单等），手机端无需登录即可查看
+        filterChainDefinitionMap.put("/profile/**", "anon");
         // 注册相关
         filterChainDefinitionMap.put("/register", "anon,captchaValidate");
         // 系统权限列表
