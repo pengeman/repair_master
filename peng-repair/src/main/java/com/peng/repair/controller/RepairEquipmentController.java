@@ -151,6 +151,31 @@ public class RepairEquipmentController extends BaseController
                         }
                     }
                 }
+                // 设备属性：支持数字或 焊接换热器/可拆换热器 文本
+                String attribute = toStringValue(row.get("attribute"));
+                if (StringUtils.isNotEmpty(attribute))
+                {
+                    if ("焊接换热器".equals(attribute))
+                    {
+                        equipment.setAttribute(0L);
+                    }
+                    else if ("可拆换热器".equals(attribute))
+                    {
+                        equipment.setAttribute(1L);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            equipment.setAttribute(Long.valueOf(attribute));
+                        }
+                        catch (NumberFormatException e)
+                        {
+                            failCount++;
+                            continue;
+                        }
+                    }
+                }
                 list.add(equipment);
             }
         }
