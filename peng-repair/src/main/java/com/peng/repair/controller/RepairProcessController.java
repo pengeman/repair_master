@@ -197,6 +197,8 @@ public class RepairProcessController extends BaseController
             RepairEquipment repairEquipment = repairEquipmentService.selectRepairEquipmentById(mainId);
             mmap.put("repairEquipment", repairEquipment);
             mmap.put("mainId", mainId);
+            // 该工单已记录的维修过程（弹窗中回显）
+            mmap.put("processList", repairProcessService.selectRepairProcessListByMainId(mainId));
         }
         return prefix + "/add";
     }
@@ -210,7 +212,19 @@ public class RepairProcessController extends BaseController
     @ResponseBody
     public AjaxResult addSave(RepairProcess repairProcess)
     {
-        return toAjax(repairProcessService.insertRepairProcess(repairProcess));
+        int rows = repairProcessService.insertRepairProcess(repairProcess);
+        // 保存过程记录后，工单标记为正在维修：开工时间=当前时间、维修状态=1（0待维修/1维修中/2完工）
+        if (StringUtils.isNotNull(repairProcess.getMainId()))
+        {
+            RepairEquipment repairEquipment = new RepairEquipment();
+            repairEquipment.setId(repairProcess.getMainId());
+            repairEquipment.setStartTime(new Date());
+            repairEquipment.setRepairStatus(1L);
+            // 兼容旧状态字段（列表展示：1待开始/2维修中/3已完工）
+            repairEquipment.setStatus(2L);
+            repairEquipmentService.updateRepairEquipment(repairEquipment);
+        }
+        return toAjax(rows);
     }
 
     /**

@@ -8,6 +8,7 @@
         <div class="row">
             <div class="col-sm-12 search-collapse">
                 <form id="formId">
+                    <input type="hidden" name="repairStatus" value="0"/>
                     <div class="select-list">
                         <ul>
                             <li>
@@ -36,13 +37,13 @@
             </div>
 
             <div class="btn-group-sm" id="toolbar" role="group">
-                <a class="btn btn-success" onclick="$.operate.notstart()" shiro:hasPermission="system:equipmentinfo:add">
+                <a class="btn btn-success active" id="btn-repair-status-0" onclick="setStatus(0)">
                     <i class="fa fa-plus"></i> 未开工
                 </a>
-                <a class="btn btn-primary single disabled" onclick="$.operate.doworking()" shiro:hasPermission="system:equipmentinfo:edit">
+                <a class="btn btn-primary" id="btn-repair-status-1" onclick="setStatus(1)">
                     <i class="fa fa-edit"></i> 正在维修
                 </a>
-                <a class="btn btn-info single disabled" onclick="$.operate.finished()" shiro:hasPermission="system:equipmentinfo:list">
+                <a class="btn btn-info" id="btn-repair-status-2" onclick="setStatus(2)">
                     <i class="fa fa-eye"></i> 已完工
                 </a>
 <!--                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:equipmentinfo:remove">
@@ -167,7 +168,13 @@
             });
         });
 
-       
+        function setStatus(status) {
+            $('input[name="repairStatus"]').val(status);
+            $('#btn-repair-status-0,#btn-repair-status-1,#btn-repair-status-2').removeClass('active');
+            $('#btn-repair-status-' + status).addClass('active');
+            $.table.refresh();
+        }
+
     </script>
 </body>
 </html>

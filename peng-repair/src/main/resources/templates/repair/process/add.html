@@ -27,6 +27,33 @@
                 </div>
             </div>
             <div>新增记录</div>
+            <!-- 已记录的维修过程（回显） -->
+            <div class="col-xs-12" th:if="${processList != null and !processList.isEmpty()}">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">已记录：</label>
+                    <div class="col-sm-8">
+                        <table class="table table-bordered table-condensed" style="margin-bottom: 10px;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 130px;">记录时间</th>
+                                    <th>过程描述</th>
+                                    <th style="width: 90px;">过程图片</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="record : ${processList}">
+                                    <td th:text="${#dates.format(record.recordTime, 'yyyy-MM-dd HH:mm:ss')}">-</td>
+                                    <td th:text="${record.mediaDesc}">-</td>
+                                    <td th:if="${not #strings.isEmpty(record.mediaFile)}">
+                                        <a th:href="${record.mediaFile}" target="_blank"><i class="fa fa-eye"></i> 查看</a>
+                                    </td>
+                                    <td th:if="${#strings.isEmpty(record.mediaFile)}">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <div class="col-xs-12">
                 <div class="form-group">
                     <label class="col-sm-3 control-label">过程图片：</label>
@@ -90,7 +117,7 @@
         }).on('filebatchselected', function (event, data) {
             $(this).fileinput('upload');
         }).on('fileuploaded', function (event, data, previewId, index) {
-            $("input[name='" + event.currentTarget.id + "']").val(data.response.url)
+            $("input[name='" + event.currentTarget.id + "']").val(data.response.fileName)
         }).on('fileremoved', function (event, id, index) {
             $("input[name='" + event.currentTarget.id + "']").val('')
         })
