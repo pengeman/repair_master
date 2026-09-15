@@ -88,8 +88,9 @@ public class RepairProcessController extends BaseController
 
     /**
      * 查看维修过程详情（该工单的所有维修记录）
+     * 工单信息模块的"查看过程"也复用此接口，故权限用工单信息的查询权限
      */
-    @RequiresPermissions("repair:process:view")
+    @RequiresPermissions("system:equipmentinfo:list")
     @Log(title = "维修过程", businessType = BusinessType.OTHER)
     @GetMapping("/view/{id}")
     public String view(@PathVariable("id") Long id, ModelMap mmap)

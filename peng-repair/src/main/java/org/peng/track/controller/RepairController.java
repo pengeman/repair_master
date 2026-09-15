@@ -193,7 +193,8 @@ public class RepairController {
 
             RepairProcess process = new RepairProcess();
             process.setMainId(mainId);
-            process.setMediaFile(fileName);
+            // 存相对路径（/profile/pics/xxx 或 /profile/video/xxx），前端可直接当 src 用
+            process.setMediaFile("/profile/" + subDir + fileName);
             process.setMediaDesc(desc);
             process.setRecordTime(LocalDateTime.now().toString());
             process.setFileType(type);

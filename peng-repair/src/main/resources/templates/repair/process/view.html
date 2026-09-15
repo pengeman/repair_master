@@ -30,7 +30,7 @@
                     <tr th:if="${not #strings.isEmpty(record.mediaFile)}">
                         <th>过程图片</th>
                         <td>
-                            <img class="detail-img" th:src="${record.mediaFile}" alt="过程图片" onclick="window.open(this.src)">
+                            <img class="detail-img" th:src="${record.mediaFile}" th:attr="data-type=${record.fileType}" alt="过程图片" onclick="window.open(this.src)">
                         </td>
                     </tr>
                 </table>
@@ -39,5 +39,18 @@
         </div>
     </div>
     <th:block th:include="include :: footer" />
+    <script>
+        // 媒体 URL 兼容三种历史数据：完整URL(http开头)、绝对路径(/开头)、裸文件名(手机端上传)
+        $(function() {
+            $('.detail-img').each(function() {
+                var f = $(this).attr('src'); // 原始属性值，避免用 this.src（已被浏览器解析成完整URL）
+                if (!f) return;
+                if (f.indexOf('http') === 0) return; // 完整URL，直接使用
+                if (f.indexOf('/') === 0) return;    // 绝对路径，直接使用
+                var dir = ($(this).attr('data-type') === 'video') ? '/profile/video/' : '/profile/pics/';
+                this.src = dir + f;                  // 裸文件名，补前缀
+            });
+        });
+    </script>
 </body>
 </html>
