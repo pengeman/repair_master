@@ -28,7 +28,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <sql id="selectRepairEquipmentVo">
-        select id, model, sn, fault_desc, repair_desc, order_time, start_time, salename, status, quality from repair_equipment
+        select id, model, sn, fault_desc, repair_desc, order_time, start_time, salename, status, quality from repair_equipment order order_time desc
     </sql>
 
     <select id="selectRepairProcessList" parameterType="RepairProcess" resultMap="RepairProcessResult">

@@ -38,8 +38,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectRepairEquipmentList" parameterType="RepairEquipment" resultMap="RepairEquipmentResult">
         <include refid="selectRepairEquipmentVo"/>
         <where>  
-            <if test="model != null  and model != ''"> and model = #{model}</if>
-            <if test="sn != null  and sn != ''"> and sn = #{sn}</if>
+            <if test="model != null  and model != ''"> and model like concat('%', #{model}, '%')</if>
+            <if test="sn != null  and sn != ''"> and sn like concat('%', #{sn}, '%')</if>
             <if test="quality != null "> and quality = #{quality}</if>
             <if test="repairStatus != null "> and repair_status = #{repairStatus}</if>
         </where>

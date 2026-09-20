@@ -295,14 +295,40 @@ public class RepairEquipmentController extends BaseController
     }
 
     /**
-     * 修改保存工单维护
+     * 修改保存工单维护（含 dispatch_img 文件上传）
      */
     @RequiresPermissions("system:equipment:edit")
     @Log(title = "工单维护", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(RepairEquipment repairEquipment)
+    public AjaxResult editSave(RepairEquipment repairEquipment,
+            @RequestParam(value = "dispatchImgFile", required = false) MultipartFile dispatchImgFile)
     {
+        if (dispatchImgFile != null && !dispatchImgFile.isEmpty())
+        {
+            try
+            {
+                String ext = "";
+                String originalName = dispatchImgFile.getOriginalFilename();
+                if (originalName != null && originalName.contains("."))
+                {
+                    ext = originalName.substring(originalName.lastIndexOf("."));
+                }
+                String fileName = "dispatch_" + System.currentTimeMillis() + ext;
+                java.io.File target = new java.io.File(RuoYiConfig.getProfile() + "/pics/" + fileName);
+                java.io.File parentDir = target.getParentFile();
+                if (parentDir != null && !parentDir.exists())
+                {
+                    parentDir.mkdirs();
+                }
+                dispatchImgFile.transferTo(target);
+                repairEquipment.setDispatchImg(fileName);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
         return toAjax(repairEquipmentService.updateRepairEquipment(repairEquipment));
     }
 
