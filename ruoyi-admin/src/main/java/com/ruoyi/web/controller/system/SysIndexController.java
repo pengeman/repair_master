@@ -69,6 +69,11 @@ public class SysIndexController extends BaseController
         }
         // 取身份信息
         SysUser user = getSysUser();
+        // 未登录（会话失效、被踢出等）直接回登录页，避免NPE
+        if (user == null)
+        {
+            return "redirect:/login";
+        }
         // 根据用户id取出菜单
         List<SysMenu> menus = menuService.selectMenusByUser(user);
         mmap.put("menus", menus);
