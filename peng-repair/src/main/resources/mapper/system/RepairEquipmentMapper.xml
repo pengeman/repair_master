@@ -43,11 +43,28 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="quality != null "> and quality = #{quality}</if>
             <if test="repairStatus != null "> and repair_status = #{repairStatus}</if>
         </where>
+        order by order_time desc
     </select>
     
     <select id="selectRepairEquipmentById" parameterType="Long" resultMap="RepairEquipmentResult">
         <include refid="selectRepairEquipmentVo"/>
         where id = #{id}
+    </select>
+
+    <resultMap type="RepairMonthStat" id="RepairStatResult">
+        <result property="orderTime"       column="ordertime"        />
+        <result property="withinWarranty"  column="within_warranty"  />
+        <result property="outsideWarranty" column="outside_warranty" />
+    </resultMap>
+
+    <select id="selectRepairMonthStats" resultMap="RepairStatResult">
+        select DATE_FORMAT(order_time, '%Y-%m') as ordertime,
+               sum(quality = 1) as within_warranty,
+               sum(quality = 2) as outside_warranty
+        from repair_equipment
+        where order_time is not null
+        group by ordertime
+        order by ordertime
     </select>
 
     <insert id="insertRepairEquipment" parameterType="RepairEquipment" useGeneratedKeys="true" keyProperty="id">

@@ -2,6 +2,7 @@ package com.peng.repair.mapper;
 
 import java.util.List;
 import com.peng.repair.domain.RepairEquipment;
+import com.peng.repair.domain.RepairMonthStat;
 
 /**
  * 工单维护Mapper接口
@@ -26,6 +27,13 @@ public interface RepairEquipmentMapper
      * @return 工单维护集合
      */
     public List<RepairEquipment> selectRepairEquipmentList(RepairEquipment repairEquipment);
+
+    /**
+     * 按月份统计维修量（保内/保外）
+     *
+     * @return 维修月度统计集合
+     */
+    public List<RepairMonthStat> selectRepairMonthStats();
 
     /**
      * 新增工单维护

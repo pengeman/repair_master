@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.peng.repair.mapper.RepairEquipmentMapper;
 import com.peng.repair.domain.RepairEquipment;
+import com.peng.repair.domain.RepairMonthStat;
 import com.peng.repair.service.IRepairEquipmentService;
 import com.ruoyi.common.core.text.Convert;
 
@@ -46,6 +47,17 @@ public class RepairEquipmentServiceImpl implements IRepairEquipmentService
     public List<RepairEquipment> selectRepairEquipmentList(RepairEquipment repairEquipment)
     {
         return repairEquipmentMapper.selectRepairEquipmentList(repairEquipment);
+    }
+
+    /**
+     * 按月份统计维修量（保内/保外）
+     *
+     * @return 维修月度统计集合
+     */
+    @Override
+    public List<RepairMonthStat> selectRepairMonthStats()
+    {
+        return repairEquipmentMapper.selectRepairMonthStats();
     }
 
     /**

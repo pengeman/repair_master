@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.peng.repair.mapper.RepairEquipmentReportMapper">
+    
+    <resultMap type="RepairEquipmentReport" id="RepairEquipmentReportResult">
+        <result property="id"    column="id"    />
+        <result property="salename"    column="salename"    />
+        <result property="model"    column="model"    />
+        <result property="sn"    column="sn"    />
+        <result property="dispatchImg"    column="dispatch_img"    />
+        <result property="faultDesc"    column="fault_desc"    />
+        <result property="repairDesc"    column="repair_desc"    />
+        <result property="faultReason"    column="fault_reason"    />
+        <result property="summary"    column="summary"    />
+        <result property="orderTime"    column="order_time"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="status"    column="status"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="faultType"    column="fault_type"    />
+        <result property="quality"    column="quality"    />
+    </resultMap>
+
+    <sql id="selectRepairEquipmentReportVo">
+        select id, salename, model, sn, dispatch_img, fault_desc, repair_desc, fault_reason, summary, order_time, start_time, status, end_time, fault_type, quality from repair_equipment
+    </sql>
+
+    <select id="selectRepairEquipmentReportList" parameterType="RepairEquipmentReport" resultMap="RepairEquipmentReportResult">
+        <include refid="selectRepairEquipmentReportVo"/>
+        <where>  
+        </where>
+    </select>
+    
+    <select id="selectRepairEquipmentReportById" parameterType="Long" resultMap="RepairEquipmentReportResult">
+        <include refid="selectRepairEquipmentReportVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertRepairEquipmentReport" parameterType="RepairEquipmentReport" useGeneratedKeys="true" keyProperty="id">
+        insert into repair_equipment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="salename != null">salename,</if>
+            <if test="model != null">model,</if>
+            <if test="sn != null">sn,</if>
+            <if test="dispatchImg != null">dispatch_img,</if>
+            <if test="faultDesc != null">fault_desc,</if>
+            <if test="repairDesc != null">repair_desc,</if>
+            <if test="faultReason != null">fault_reason,</if>
+            <if test="summary != null">summary,</if>
+            <if test="orderTime != null">order_time,</if>
+            <if test="startTime != null">start_time,</if>
+            <if test="status != null">status,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="faultType != null">fault_type,</if>
+            <if test="quality != null">quality,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="salename != null">#{salename},</if>
+            <if test="model != null">#{model},</if>
+            <if test="sn != null">#{sn},</if>
+            <if test="dispatchImg != null">#{dispatchImg},</if>
+            <if test="faultDesc != null">#{faultDesc},</if>
+            <if test="repairDesc != null">#{repairDesc},</if>
+            <if test="faultReason != null">#{faultReason},</if>
+            <if test="summary != null">#{summary},</if>
+            <if test="orderTime != null">#{orderTime},</if>
+            <if test="startTime != null">#{startTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="faultType != null">#{faultType},</if>
+            <if test="quality != null">#{quality},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRepairEquipmentReport" parameterType="RepairEquipmentReport">
+        update repair_equipment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="salename != null">salename = #{salename},</if>
+            <if test="model != null">model = #{model},</if>
+            <if test="sn != null">sn = #{sn},</if>
+            <if test="dispatchImg != null">dispatch_img = #{dispatchImg},</if>
+            <if test="faultDesc != null">fault_desc = #{faultDesc},</if>
+            <if test="repairDesc != null">repair_desc = #{repairDesc},</if>
+            <if test="faultReason != null">fault_reason = #{faultReason},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="orderTime != null">order_time = #{orderTime},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="faultType != null">fault_type = #{faultType},</if>
+            <if test="quality != null">quality = #{quality},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteRepairEquipmentReportById" parameterType="Long">
+        delete from repair_equipment where id = #{id}
+    </delete>
+
+    <delete id="deleteRepairEquipmentReportByIds" parameterType="String">
+        delete from repair_equipment where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
